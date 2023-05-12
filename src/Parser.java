@@ -34,7 +34,6 @@ public class Parser {
         while(not_eof()) {
             program.body.add(this.parseStmt());
         }
-
         return program;
     }
 
@@ -81,7 +80,7 @@ public class Parser {
                 return new Identifier(this.eat().value);
             }
             case Number -> {
-                return new NumericLiteral(Float.parseFloat(this.eat().value));
+                return new NumericLiteral(Double.parseDouble(this.eat().value));
             }
             case OpenParen -> {
                 this.eat();

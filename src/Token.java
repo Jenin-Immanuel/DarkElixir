@@ -6,7 +6,6 @@ enum TokenType {
     Equals,
     OpenParen,
     CloseParen,
-    Null,
     EOF
 }
 

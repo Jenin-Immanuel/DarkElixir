@@ -18,7 +18,6 @@ public class Lexer {
     static {
         KEYWORDS = new HashMap<>();
         KEYWORDS.put("let", TokenType.Let);
-        KEYWORDS.put("null", TokenType.Null);
     }
 
 

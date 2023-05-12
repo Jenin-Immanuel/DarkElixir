@@ -1,6 +1,7 @@
 enum RuntimeValueType {
     Null,
-    Number
+    Number,
+    Boolean
 }
 
 public abstract class RuntimeValue {
@@ -27,7 +28,13 @@ class RNullValue extends RuntimeValue {
 
 class RNumberValue extends RuntimeValue {
     public RuntimeValueType kind = RuntimeValueType.Number;
-    public Float number;
+    public Double number;
+
+    public RNumberValue() {}
+
+    public RNumberValue(Double number) {
+        this.number = number;
+    }
 
     @Override
     public String toString() {
@@ -37,5 +44,23 @@ class RNumberValue extends RuntimeValue {
     @Override
     public RuntimeValueType getKind() {
         return RuntimeValueType.Number;
+    }
+}
+
+class RBooleanValue extends RuntimeValue {
+    public Boolean value;
+
+    public RBooleanValue(Boolean value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "RBooleanValue{" + value + "}";
+    }
+
+    @Override
+    public RuntimeValueType getKind() {
+        return RuntimeValueType.Boolean;
     }
 }

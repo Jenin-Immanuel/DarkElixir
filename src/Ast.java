@@ -6,7 +6,6 @@ enum AstNode {
     Identifier,
     BinaryExpr,
 
-    NullLiteral
 }
 
 abstract class Stmt {
@@ -60,9 +59,9 @@ class Identifier extends Expr {
 
 class NumericLiteral extends Expr {
     public AstNode kind = AstNode.NumericLiteral;
-    public Float value;
+    public Double value;
 
-    public NumericLiteral(Float value) {
+    public NumericLiteral(Double value) {
         this.value = value;
     }
 
@@ -98,15 +97,5 @@ class BinaryExpr extends Expr {
     @Override
     public AstNode getKind() {
         return AstNode.BinaryExpr;
-    }
-}
-
-class NullLiteral extends Expr {
-    public AstNode kind = AstNode.NullLiteral;
-    public String value = "null";
-
-    @Override
-    public AstNode getKind() {
-        return AstNode.NullLiteral;
     }
 }
