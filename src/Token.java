@@ -6,6 +6,8 @@ enum TokenType {
     Match,
     OpenParen,
     CloseParen,
+    Atom,
+    Equals,
     EOF
 }
 

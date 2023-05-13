@@ -9,6 +9,8 @@ public class Main {
 
         env.declareVariable("x", new RNumberValue(100D));
         env.declareVariable("null", new RNullValue());
+//        env.declareVariable("true", new RAtomValue("true"));
+//        env.declareVariable("false", new RAtomValue("false"));
         env.declareVariable("true", new RBooleanValue(true));
         env.declareVariable("false", new RBooleanValue(false));
         while(true) {

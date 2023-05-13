@@ -28,6 +28,7 @@ public class Parser {
     public Program produceAst(String code) {
         Lexer lexer = new Lexer(code);
         this.tokens = (ArrayList<Token>) lexer.tokenize();
+//        System.out.println(tokens);
         Program program = new Program();
         program.body = new ArrayList<Stmt>();
 
@@ -41,7 +42,21 @@ public class Parser {
         return this.parseExpr();
     }
     private Expr parseExpr() {
-        return this.parseAdditiveExpr();
+        return this.parseRelationalExpr();
+    }
+
+    private Expr parseRelationalExpr() {
+        var left  = this.parseAdditiveExpr();
+        while(this.at().value.equals("==")) {
+            var op = this.eat().value;
+            var right = this.parseAdditiveExpr();
+            var binExp = new BinaryExpr();
+            binExp.left = left;
+            binExp.right = right;
+            binExp.op = op;
+            left = binExp;
+        }
+        return left;
     }
 
     private Expr parseAdditiveExpr() {
@@ -81,6 +96,10 @@ public class Parser {
             }
             case Number -> {
                 return new NumericLiteral(Double.parseDouble(this.eat().value));
+            }
+            case Atom -> {
+                // Removes the ':' from the string so that the value contains the actual value
+                return new Atom(this.eat().value.substring(1));
             }
             case OpenParen -> {
                 this.eat();

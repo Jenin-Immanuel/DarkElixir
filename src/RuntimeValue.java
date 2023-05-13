@@ -1,7 +1,8 @@
 enum RuntimeValueType {
     Null,
     Number,
-    Boolean
+    Boolean,
+    Atom
 }
 
 public abstract class RuntimeValue {
@@ -62,5 +63,23 @@ class RBooleanValue extends RuntimeValue {
     @Override
     public RuntimeValueType getKind() {
         return RuntimeValueType.Boolean;
+    }
+}
+
+class RAtomValue extends RuntimeValue {
+    public String value;
+
+
+    public RAtomValue(String value) {
+        this.value = value;
+    }
+    @Override
+    public String toString() {
+        return "RAtomValue{" + value + "}";
+    }
+
+    @Override
+    public RuntimeValueType getKind() {
+        return RuntimeValueType.Atom;
     }
 }

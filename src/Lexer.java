@@ -20,6 +20,10 @@ public class Lexer {
         KEYWORDS.put("let", TokenType.Let);
     }
 
+    private boolean borderCheck() {
+        return this.i < this.src.length();
+    }
+
 
     public List<Token> tokenize() {
         List<Token> tokens = new ArrayList<>();
@@ -34,7 +38,23 @@ public class Lexer {
                 tokens.add(new Token(Character.toString(src.charAt(i)), TokenType.BinaryOperator));
             }
             else if(src.charAt(i) == '=') {
+                if(this.borderCheck() && src.charAt(i + 1) == '=') {
+                    tokens.add(new Token("==", TokenType.Equals));
+                    i += 2;
+                    continue;
+                }
                 tokens.add(new Token("=", TokenType.Match));
+            }
+            else if(src.charAt(i) == ':') {
+                StringBuilder atom = new StringBuilder(":");
+                i++;
+                if(Character.isLetter(src.charAt(i))) {
+                    atom.append(src.charAt(i++));
+                    while(this.borderCheck() && (Character.isDigit(src.charAt(i)) || Character.isLetter(src.charAt(i))  || src.charAt(i) == '_'))
+                        atom.append(src.charAt(i++));
+                }
+                tokens.add(new Token(atom.toString(), TokenType.Atom));
+                continue;
             }
             else {
                 if(Character.isDigit(src.charAt(i))) {

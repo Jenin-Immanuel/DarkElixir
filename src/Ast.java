@@ -5,6 +5,7 @@ enum AstNode {
     NumericLiteral,
     Identifier,
     BinaryExpr,
+    Atom
 
 }
 
@@ -97,5 +98,25 @@ class BinaryExpr extends Expr {
     @Override
     public AstNode getKind() {
         return AstNode.BinaryExpr;
+    }
+}
+
+class Atom extends Expr {
+    public String value;
+
+    public Atom(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "Atom{" +
+                "value='" + value + '\'' +
+                '}';
+    }
+
+    @Override
+    public AstNode getKind() {
+        return AstNode.Atom;
     }
 }
