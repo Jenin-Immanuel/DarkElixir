@@ -3,7 +3,7 @@ enum TokenType {
     Identifier,
     Let,
     BinaryOperator,
-    Equals,
+    Match,
     OpenParen,
     CloseParen,
     EOF

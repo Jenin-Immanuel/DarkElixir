@@ -34,7 +34,7 @@ public class Lexer {
                 tokens.add(new Token(Character.toString(src.charAt(i)), TokenType.BinaryOperator));
             }
             else if(src.charAt(i) == '=') {
-                tokens.add(new Token("=", TokenType.Equals));
+                tokens.add(new Token("=", TokenType.Match));
             }
             else {
                 if(Character.isDigit(src.charAt(i))) {
@@ -57,7 +57,7 @@ public class Lexer {
                     i++;
                 }
                 else {
-                    System.out.println("Unrecognized character: " + src.charAt(i));
+                    System.err.println("Unrecognized character: " + src.charAt(i));
                     System.exit(0);
                 }
                 continue;

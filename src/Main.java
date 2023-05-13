@@ -1,8 +1,4 @@
-import jdk.jshell.spi.ExecutionEnv;
-
-import java.util.ArrayList;
 import java.util.Scanner;
-
 public class Main {
     static void repl() {
         Scanner sc = new Scanner(System.in);
@@ -22,7 +18,7 @@ public class Main {
                 System.out.println("Bye Bye...");
                 break;
             }
-//            System.out.println(prompt);
+
 
             Program program = parser.produceAst(prompt);
             var result = Interpreter.evaluateProgram(program, env);

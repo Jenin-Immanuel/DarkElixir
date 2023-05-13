@@ -11,7 +11,7 @@ public class Environment {
 
     public RuntimeValue declareVariable(String variableName, RuntimeValue value) {
         if(this.variables.containsKey(variableName)) {
-            System.out.println("Cannot declare a variable that already exists. Variable: " + variableName);
+            System.err.println("Cannot declare a variable that already exists. Variable: " + variableName);
             System.exit(0);
         }
         this.variables.put(variableName, value);
@@ -34,7 +34,7 @@ public class Environment {
             return this;
         }
         if(this.parent == null) {
-            System.out.println("Cannot resolve variable " + variableName + " as it doesn't exist.");
+            System.err.println("Cannot resolve variable " + variableName + " as it doesn't exist.");
             System.exit(0);
         }
         return this.resolveEnvironment(variableName);

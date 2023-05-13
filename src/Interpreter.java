@@ -54,7 +54,7 @@ public class Interpreter {
                     return evaluateIdentifier((Identifier) astNode, env);
                 }
                 default -> {
-                    System.out.println("This AST Node has not yet been setup for interpretation. " + astNode);
+                    System.err.println("This AST Node has not yet been setup for interpretation. " + astNode);
                     System.exit(0);
                 }
             }

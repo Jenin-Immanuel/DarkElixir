@@ -20,7 +20,7 @@ public class Parser {
     private void expect(TokenType type, String message) {
         Token prev = this.eat();
         if(prev == null || prev.type != type) {
-            System.out.println("Parser error: " + message + " " + prev + " - Expecting: " + type);
+            System.err.println("Parser error: " + message + " " + prev + " - Expecting: " + type);
             System.exit(0);
         }
     }
@@ -89,7 +89,7 @@ public class Parser {
                 return value;
             }
             default -> {
-                System.out.println("Unexpected token found during parsing! " + this.at());
+                System.err.println("Unexpected token found during parsing! " + this.at());
                 System.exit(0);
             }
         }
