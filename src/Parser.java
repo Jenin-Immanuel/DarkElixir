@@ -26,7 +26,7 @@ public class Parser {
     }
 
     private boolean checkRelationalOperators(String op) {
-        return op.equals("==") || op.equals("<") || op.equals(">") || op.equals("<=") || op.equals(">=");
+        return op.equals("==") || op.equals("<") || op.equals(">") || op.equals("<=") || op.equals(">=") || op.equals("!=");
     }
 
     public Program produceAst(String code) {

@@ -12,6 +12,8 @@ enum TokenType {
     GreaterThan,
     LessThanOrEqual,
     GreaterThanOrEqual,
+    NotEqual,
+    Not,
     EOF
 }
 

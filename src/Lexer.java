@@ -62,6 +62,14 @@ public class Lexer {
                 }
                 tokens.add(new Token("=", TokenType.Match));
             }
+            else if(src.charAt(i) == '!') {
+                if(this.borderCheck() && src.charAt(i + 1) == '=') {
+                    tokens.add(new Token("!=", TokenType.NotEqual));
+                    i += 2;
+                    continue;
+                }
+                tokens.add(new Token("!", TokenType.Not));
+            }
             else if(src.charAt(i) == ':') {
                 StringBuilder atom = new StringBuilder(":");
                 i++;

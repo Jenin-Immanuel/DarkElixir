@@ -14,7 +14,7 @@ public class Main {
         env.declareVariable("true", new RBooleanValue(true));
         env.declareVariable("false", new RBooleanValue(false));
         while(true) {
-            System.out.print("user> ");
+            System.out.print("dex> ");
             String prompt = sc.nextLine();
             if(prompt.equals("exit") || prompt.equals("e")) {
                 System.out.println("Bye Bye...");
