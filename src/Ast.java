@@ -5,6 +5,7 @@ enum AstNode {
     NumericLiteral,
     Identifier,
     BinaryExpr,
+    MatchExpr,
     Atom
 
 }
@@ -35,6 +36,31 @@ class Program extends Stmt {
 
 abstract class Expr extends Stmt {
 
+}
+
+class MatchExpr extends Expr {
+    public Expr toAssigned;
+    public Expr value;
+
+    public MatchExpr() {}
+
+    public MatchExpr(Expr toAssigned, Expr value) {
+        this.toAssigned = toAssigned;
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "MatchExpr{" +
+                "toAssigned=" + toAssigned +
+                ", value=" + value +
+                '}';
+    }
+
+    @Override
+    public AstNode getKind() {
+        return AstNode.MatchExpr;
+    }
 }
 
 class Identifier extends Expr {

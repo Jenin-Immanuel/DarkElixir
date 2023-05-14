@@ -1,3 +1,5 @@
+import java.net.IDN;
+
 public class Interpreter {
     static RuntimeValue evaluateProgram(Program program, Environment env) {
         RuntimeValue lastEvaluated = new RNullValue();
@@ -69,6 +71,29 @@ public class Interpreter {
         return env.lookupVariable(astNode.symbol);
     }
 
+    static RuntimeValue evaluateMatchExpr(MatchExpr matchExpr, Environment env) {
+
+
+        if(matchExpr.toAssigned.getKind() != AstNode.Identifier) {
+            System.err.println("Invalid LHS of the Match expression " + matchExpr.toAssigned);
+            System.exit(0);
+        }
+        var asIdentifier = (Identifier) matchExpr.toAssigned;
+
+        // Check for constants
+
+        if(asIdentifier.symbol.equals("true") || asIdentifier.symbol.equals("false") || asIdentifier.symbol.equals("null")) {
+            System.err.println("Invalid LHS of the Match expression. Expected Identifier got " + asIdentifier.symbol);
+            System.exit(0);
+        }
+
+        // Assign the new value, if it is present in the current environment
+        if(env.containsVariable(asIdentifier.symbol))
+            return env.assignVariable(asIdentifier.symbol, evaluate(matchExpr.value, env));
+
+        return env.declareVariable(asIdentifier.symbol, evaluate(matchExpr.value, env));
+    }
+
     static RuntimeValue evaluate(Stmt astNode, Environment env) {
         if(astNode.getKind() != null) {
             switch (astNode.getKind()) {
@@ -83,6 +108,9 @@ public class Interpreter {
                 }
                 case BinaryExpr -> {
                     return evaluateBinaryExpr((BinaryExpr) astNode, env);
+                }
+                case MatchExpr -> {
+                    return evaluateMatchExpr((MatchExpr) astNode, env);
                 }
                 case Atom -> {
                     String atomValue = ((Atom) astNode).value;

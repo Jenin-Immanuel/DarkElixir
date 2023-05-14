@@ -46,7 +46,19 @@ public class Parser {
         return this.parseExpr();
     }
     private Expr parseExpr() {
-        return this.parseRelationalExpr();
+        return this.parseMatchExpr();
+    }
+
+    private Expr parseMatchExpr() {
+        // toAssigned value
+        var left = this.parseRelationalExpr();
+        if(this.at().type == TokenType.Match) {
+            // Go through the match operator
+            this.eat();
+            var right = this.parseMatchExpr(); // Result
+            return new MatchExpr(left, right);
+        }
+        return left;
     }
 
     private Expr parseRelationalExpr() {
