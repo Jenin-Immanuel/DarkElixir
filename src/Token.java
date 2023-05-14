@@ -8,6 +8,10 @@ enum TokenType {
     CloseParen,
     Atom,
     Equals,
+    LessThan,
+    GreaterThan,
+    LessThanOrEqual,
+    GreaterThanOrEqual,
     EOF
 }
 

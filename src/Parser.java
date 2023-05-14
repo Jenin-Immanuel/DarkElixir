@@ -25,6 +25,10 @@ public class Parser {
         }
     }
 
+    private boolean checkRelationalOperators(String op) {
+        return op.equals("==") || op.equals("<") || op.equals(">") || op.equals("<=") || op.equals(">=");
+    }
+
     public Program produceAst(String code) {
         Lexer lexer = new Lexer(code);
         this.tokens = (ArrayList<Token>) lexer.tokenize();
@@ -47,7 +51,7 @@ public class Parser {
 
     private Expr parseRelationalExpr() {
         var left  = this.parseAdditiveExpr();
-        while(this.at().value.equals("==")) {
+        while(this.checkRelationalOperators(this.at().value)) {
             var op = this.eat().value;
             var right = this.parseAdditiveExpr();
             var binExp = new BinaryExpr();

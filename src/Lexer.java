@@ -37,6 +37,23 @@ public class Lexer {
             else if(src.charAt(i) == '+' || src.charAt(i) == '-' || src.charAt(i) == '*' || src.charAt(i) == '/' || src.charAt(i) == '%') {
                 tokens.add(new Token(Character.toString(src.charAt(i)), TokenType.BinaryOperator));
             }
+            else if(src.charAt(i) == '<') {
+                if(this.borderCheck() && src.charAt(i + 1) == '=') {
+                    tokens.add(new Token("<=", TokenType.LessThanOrEqual));
+                    i += 2;
+                    continue;
+                }
+                tokens.add(new Token("<", TokenType.LessThan));
+            }
+            else if(src.charAt(i) == '>') {
+                if(this.borderCheck() && src.charAt(i + 1) == '=') {
+                    tokens.add(new Token(">=", TokenType.GreaterThanOrEqual));
+                    i += 2;
+                    continue;
+                }
+                tokens.add(new Token(">", TokenType.GreaterThan));
+
+            }
             else if(src.charAt(i) == '=') {
                 if(this.borderCheck() && src.charAt(i + 1) == '=') {
                     tokens.add(new Token("==", TokenType.Equals));

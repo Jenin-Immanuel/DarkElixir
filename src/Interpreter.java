@@ -31,6 +31,18 @@ public class Interpreter {
             case "==" -> {
                 result.value = leftAtomValue.equals(rightAtomValue);
             }
+            case ">=" -> {
+                result.value = leftAtomValue.compareTo(rightAtomValue) >= 0;
+            }
+            case ">" -> {
+                result.value = leftAtomValue.compareTo(rightAtomValue) > 0;
+            }
+            case "<=" -> {
+                result.value = leftAtomValue.compareTo(rightAtomValue) <= 0;
+            }
+            case "<" -> {
+                result.value = leftAtomValue.compareTo(rightAtomValue) < 0;
+            }
             default -> {
                 return new RNullValue();
             }
