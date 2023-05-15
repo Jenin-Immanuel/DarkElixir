@@ -74,10 +74,11 @@ public class Interpreter {
     static RuntimeValue evaluateMatchExpr(MatchExpr matchExpr, Environment env) {
 
 
-        if(matchExpr.toAssigned.getKind() != AstNode.Identifier) {
+        if(matchExpr.toAssigned.getKind() != AstNode.Identifier && matchExpr.toAssigned.getKind() != AstNode.Tuple) {
             System.err.println("Invalid LHS of the Match expression " + matchExpr.toAssigned);
             System.exit(0);
         }
+
         var asIdentifier = (Identifier) matchExpr.toAssigned;
 
         // Check for constants
@@ -92,6 +93,14 @@ public class Interpreter {
             return env.assignVariable(asIdentifier.symbol, evaluate(matchExpr.value, env));
 
         return env.declareVariable(asIdentifier.symbol, evaluate(matchExpr.value, env));
+    }
+
+    static RuntimeValue evaluateTuple(Tuple tuple, Environment env) {
+        RTupleValue newTuple = new RTupleValue();
+        for(Expr content: tuple.contents) {
+            newTuple.contents.add(evaluate(content, env));
+        }
+        return newTuple;
     }
 
     static RuntimeValue evaluate(Stmt astNode, Environment env) {
@@ -118,6 +127,9 @@ public class Interpreter {
                 }
                 case Identifier ->  {
                     return evaluateIdentifier((Identifier) astNode, env);
+                }
+                case Tuple -> {
+                    return evaluateTuple((Tuple) astNode, env);
                 }
                 default -> {
                     System.err.println("This AST Node has not yet been setup for interpretation. " + astNode);

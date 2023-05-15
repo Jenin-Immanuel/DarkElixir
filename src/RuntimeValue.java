@@ -1,8 +1,11 @@
+import java.util.ArrayList;
+
 enum RuntimeValueType {
     Null,
     Number,
     Boolean,
-    Atom
+    Atom,
+    Tuple
 }
 
 public abstract class RuntimeValue {
@@ -81,5 +84,27 @@ class RAtomValue extends RuntimeValue {
     @Override
     public RuntimeValueType getKind() {
         return RuntimeValueType.Atom;
+    }
+}
+
+class RTupleValue extends RuntimeValue {
+    public ArrayList<RuntimeValue> contents;
+
+    public RTupleValue() {
+        this.contents = new ArrayList<>();
+    }
+
+    public RTupleValue(ArrayList<RuntimeValue> contents) {
+        this.contents = contents;
+    }
+
+    @Override
+    public String toString() {
+        return "RTupleValue{ " + contents + " }";
+    }
+
+    @Override
+    public RuntimeValueType getKind() {
+        return RuntimeValueType.Tuple;
     }
 }

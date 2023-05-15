@@ -81,10 +81,8 @@ public class Parser {
             newTuple.contents.add(value);
             if(this.at().type != TokenType.CloseBrace) {
                 this.expect(TokenType.Comma, "Expected TokenType Comma, But got " + this.at());
-
             }
         }
-
         // Eat the close brace
         this.expect(TokenType.CloseBrace, "Expected trailing Closing Brackets. But got " + this.at());
         return newTuple;
