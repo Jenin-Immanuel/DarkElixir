@@ -18,6 +18,10 @@ public class Lexer {
     static {
         KEYWORDS = new HashMap<>();
         KEYWORDS.put("let", TokenType.Let);
+        KEYWORDS.put("if", TokenType.Keyword_If);
+        KEYWORDS.put("else", TokenType.Keyword_Else);
+        KEYWORDS.put("do", TokenType.Keyword_Do);
+        KEYWORDS.put("end", TokenType.Keyword_End);
     }
 
     private boolean borderCheck() {
@@ -33,6 +37,15 @@ public class Lexer {
             }
             else if(src.charAt(i) == ')') {
                 tokens.add(new Token(")", TokenType.CloseParen));
+            }
+            else if(src.charAt(i) == '{') {
+                tokens.add(new Token("{", TokenType.OpenBrace));
+            }
+            else if(src.charAt(i) == '}') {
+                tokens.add(new Token("}", TokenType.CloseBrace));
+            }
+            else if(src.charAt(i) == ',') {
+                tokens.add(new Token(",", TokenType.Comma));
             }
             else if(src.charAt(i) == '+' || src.charAt(i) == '-' || src.charAt(i) == '*' || src.charAt(i) == '/' || src.charAt(i) == '%') {
                 tokens.add(new Token(Character.toString(src.charAt(i)), TokenType.BinaryOperator));

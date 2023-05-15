@@ -6,7 +6,8 @@ enum AstNode {
     Identifier,
     BinaryExpr,
     MatchExpr,
-    Atom
+    Atom,
+    Tuple
 
 }
 
@@ -144,5 +145,25 @@ class Atom extends Expr {
     @Override
     public AstNode getKind() {
         return AstNode.Atom;
+    }
+}
+
+class Tuple extends Expr {
+    public ArrayList<Expr> contents;
+
+    public Tuple() {
+        this.contents = new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        return "Tuple{" +
+                "contents=" + contents +
+                '}';
+    }
+
+    @Override
+    public AstNode getKind() {
+        return AstNode.Tuple;
     }
 }

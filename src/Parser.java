@@ -51,7 +51,7 @@ public class Parser {
 
     private Expr parseMatchExpr() {
         // toAssigned value
-        var left = this.parseRelationalExpr();
+        var left = this.parseTupleExpr();
         if(this.at().type == TokenType.Match) {
             // Go through the match operator
             this.eat();
@@ -59,6 +59,35 @@ public class Parser {
             return new MatchExpr(left, right);
         }
         return left;
+    }
+
+
+    //
+    private Expr parseTupleExpr() {
+        // Not a tuple
+        if(this.at().type != TokenType.OpenBrace)
+            return parseRelationalExpr();
+
+        // Eat the open brace
+        this.eat();
+
+        var newTuple = new Tuple();
+
+        // Examples
+        // { 1, 2, 3 }
+        // { 1 }
+        while(this.not_eof() && this.at().type != TokenType.CloseBrace) {
+            var value = this.parseMatchExpr();
+            newTuple.contents.add(value);
+            if(this.at().type != TokenType.CloseBrace) {
+                this.expect(TokenType.Comma, "Expected TokenType Comma, But got " + this.at());
+
+            }
+        }
+
+        // Eat the close brace
+        this.expect(TokenType.CloseBrace, "Expected trailing Closing Brackets. But got " + this.at());
+        return newTuple;
     }
 
     private Expr parseRelationalExpr() {

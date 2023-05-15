@@ -6,7 +6,10 @@ enum TokenType {
     Match,
     OpenParen,
     CloseParen,
+    OpenBrace,
+    CloseBrace,
     Atom,
+    Comma,
     Equals,
     LessThan,
     GreaterThan,
@@ -14,6 +17,10 @@ enum TokenType {
     GreaterThanOrEqual,
     NotEqual,
     Not,
+    Keyword_If,
+    Keyword_Else,
+    Keyword_Do,
+    Keyword_End,
     EOF
 }
 
