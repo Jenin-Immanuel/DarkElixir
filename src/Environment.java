@@ -26,8 +26,10 @@ public class Environment {
     }
     public RuntimeValue declareVariable(String variableName, RuntimeValue value) {
         if(this.variables.containsKey(variableName)) {
-            System.err.println("Cannot declare a variable that already exists. Variable: " + variableName);
-            System.exit(0);
+            this.assignVariable(variableName, value);
+            return value;
+//            System.err.println("Cannot declare a variable that already exists. Variable: " + variableName);
+//            System.exit(0);
         }
         this.variables.put(variableName, value);
         return value;

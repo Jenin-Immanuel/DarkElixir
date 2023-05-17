@@ -79,20 +79,75 @@ public class Interpreter {
             System.exit(0);
         }
 
-        var asIdentifier = (Identifier) matchExpr.toAssigned;
+        // Implement tuple destructuring
 
-        // Check for constants
+        switch (matchExpr.toAssigned.getKind()) {
+            case Identifier -> {
+                var asIdentifier = (Identifier) matchExpr.toAssigned;
 
-        if(asIdentifier.symbol.equals("true") || asIdentifier.symbol.equals("false") || asIdentifier.symbol.equals("null")) {
-            System.err.println("Invalid LHS of the Match expression. Expected Identifier got " + asIdentifier.symbol);
-            System.exit(0);
+                // Check for constants
+
+                if(asIdentifier.symbol.equals("true") || asIdentifier.symbol.equals("false") || asIdentifier.symbol.equals("null")) {
+                    System.err.println("Invalid LHS of the Match expression. Expected Identifier got " + asIdentifier.symbol);
+                    System.exit(0);
+                }
+
+                // Assign the new value, if it is present in the current environment
+                if(env.containsVariable(asIdentifier.symbol))
+                    return env.assignVariable(asIdentifier.symbol, evaluate(matchExpr.value, env));
+
+                return env.declareVariable(asIdentifier.symbol, evaluate(matchExpr.value, env));
+            }
+            case Tuple -> {
+                // Return the error before evaluating
+                if(matchExpr.value.getKind() != AstNode.Identifier && matchExpr.value.getKind() != AstNode.Tuple) {
+                    System.err.println("Match error. No match for the right hand value " + matchExpr.value);
+                    System.exit(0);
+                }
+
+                // toAssigned should be evaluated later on
+
+                var rhs = (RTupleValue) evaluate(matchExpr.value, env);
+                var lhsContents = ((Tuple) matchExpr.toAssigned).contents;
+
+                // The next element after the match operator should be a tuple or an identifier with a tuple
+                if(rhs.getKind() != RuntimeValueType.Tuple) {
+                    System.err.println("Match error. No match for the right hand value " + rhs.contents);
+                    System.exit(0);
+                }
+
+                // Check whether both the tuples have the same size
+                if(rhs.contents.size() != lhsContents.size()) {
+                    System.err.println("Match error. No match for the right hand value " + rhs.contents);
+                    System.exit(0);
+                }
+
+                // Check whether the functionality is pattern matching or multiple assignment
+                if(lhsContents.stream().allMatch(n -> n.getKind() == AstNode.Identifier) && !lhsContents.isEmpty()) {
+                    // Multiple assignments
+                    for(int i = 0; i < lhsContents.size(); i++) {
+                        Identifier variableLHS = (Identifier) lhsContents.get(i);
+                        RuntimeValue variableRHS = rhs.contents.get(i);
+                        env.declareVariable(variableLHS.symbol, variableRHS);
+                    }
+
+                }
+                else {
+                    for(int i = 0; i < lhsContents.size(); i++) {
+                        if(evaluate(lhsContents.get(i), env).getKind() != rhs.contents.get(i).getKind()) {
+                            System.err.println("Match error. No match for the right hand value " + rhs);
+                            System.exit(0);
+                        }
+                    }
+                }
+                return rhs;
+
+            }
+            default -> {
+
+            }
         }
-
-        // Assign the new value, if it is present in the current environment
-        if(env.containsVariable(asIdentifier.symbol))
-            return env.assignVariable(asIdentifier.symbol, evaluate(matchExpr.value, env));
-
-        return env.declareVariable(asIdentifier.symbol, evaluate(matchExpr.value, env));
+        return new RNullValue();
     }
 
     static RuntimeValue evaluateTuple(Tuple tuple, Environment env) {

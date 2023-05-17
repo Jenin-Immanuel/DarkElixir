@@ -15,7 +15,7 @@ public class Main {
 
         int line = 1;
         while(true) {
-            System.out.print("dex (" + line + ")> ");
+            System.out.print("dex(" + line + ")> ");
             String prompt = sc.nextLine();
             if(prompt.equals("exit") || prompt.equals("e")) {
                 System.out.println("Bye Bye...");
