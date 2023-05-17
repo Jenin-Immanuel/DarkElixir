@@ -4,9 +4,22 @@ public class Environment {
     private Environment parent;
     private HashMap<String, RuntimeValue> variables;
 
+    public Environment() {
+        this.parent = null;
+        this.variables = new HashMap<>();
+    }
+
     public Environment(Environment parent) {
         this.parent = parent;
         this.variables = new HashMap<>();
+    }
+
+    public static Environment createGlobalEnvironment() {
+        Environment env = new Environment();
+        env.declareVariable("null", new RNullValue());
+        env.declareVariable("true", new RBooleanValue(true));
+        env.declareVariable("false", new RBooleanValue(false));
+        return env;
     }
 
     public boolean containsVariable(String variableName) {
