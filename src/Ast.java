@@ -6,6 +6,7 @@ enum AstNode {
     Identifier,
     BinaryExpr,
     MatchExpr,
+    CallExpr,
     Atom,
     Tuple
 
@@ -125,6 +126,31 @@ class BinaryExpr extends Expr {
     @Override
     public AstNode getKind() {
         return AstNode.BinaryExpr;
+    }
+}
+
+class CallExpr extends Expr {
+    public ArrayList<Expr> args;
+    public Expr caller;
+
+    public CallExpr() {}
+
+    public CallExpr(ArrayList<Expr> args, Expr caller) {
+        this.args = args;
+        this.caller = caller;
+    }
+
+    @Override
+    public String toString() {
+        return "CallExpr{" +
+                "args=" + args +
+                ", caller=" + caller +
+                '}';
+    }
+
+    @Override
+    public AstNode getKind() {
+        return AstNode.CallExpr;
     }
 }
 

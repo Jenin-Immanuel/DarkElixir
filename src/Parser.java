@@ -117,7 +117,7 @@ public class Parser {
     }
 
     private Expr parseMultiplicativeExpr() {
-        var left = this.parsePrimaryExpr();
+        var left = this.parseCallMemberExpr();
         while(this.at().value.equals("*") || this.at().value.equals("/") || this.at().value.equals("%")) {
             var op = this.eat().value;
             var right = this.parsePrimaryExpr();
@@ -128,6 +128,41 @@ public class Parser {
             left = binExp;
         }
         return left;
+    }
+
+    private Expr parseCallMemberExpr() {
+        var caller = this.parsePrimaryExpr();
+
+        if(this.at().type == TokenType.OpenParen) {
+            return this.parseCallExpr(caller);
+        }
+        return caller;
+    }
+    private Expr parseCallExpr(Expr caller) {
+        CallExpr callExpr = new CallExpr(this.parseArguments(), caller);
+        if(this.at().type == TokenType.OpenParen) {
+            callExpr = (CallExpr) this.parseCallExpr(callExpr);
+        }
+        return callExpr;
+    }
+
+    private ArrayList<Expr> parseArguments() {
+
+        // First expect OpenParen Token
+        this.expect(TokenType.OpenParen, "Expected Open Parenthesis. Obtained " + this.at());
+        var args = this.at().type == TokenType.CloseParen ? new ArrayList<Expr>() : parseArgumentsList();
+        this.expect(TokenType.CloseParen, "Expected Closed Parenthesis. Obtained " + this.at());
+        return args;
+    }
+
+    private ArrayList<Expr> parseArgumentsList() {
+        ArrayList<Expr> args = new ArrayList<>();
+        args.add(this.parseMatchExpr());
+        while(this.at().type == TokenType.Comma) {
+            this.eat();
+            args.add(this.parseMatchExpr());
+        }
+        return args;
     }
 
     private Expr parsePrimaryExpr() {
