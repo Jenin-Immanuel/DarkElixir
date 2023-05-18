@@ -1,4 +1,6 @@
 import java.net.IDN;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Interpreter {
     static RuntimeValue evaluateProgram(Program program, Environment env) {
@@ -150,6 +152,16 @@ public class Interpreter {
         return new RNullValue();
     }
 
+    static  RuntimeValue evaluateCallExpr(CallExpr expr, Environment env) {
+        var args = expr.args.stream().map(arg -> evaluate(arg, env)).toList();
+        var fn = evaluate(expr.caller, env);
+        if(fn.getKind() != RuntimeValueType.NativeFunction) {
+            System.err.println("Cannot call a value which is not a native function " + fn);
+            System.exit(0);
+        }
+        return ((RNativeFunction) fn).call.call(new ArrayList<>(args), env);
+    }
+
     static RuntimeValue evaluateTuple(Tuple tuple, Environment env) {
         RTupleValue newTuple = new RTupleValue();
         for(Expr content: tuple.contents) {
@@ -157,6 +169,8 @@ public class Interpreter {
         }
         return newTuple;
     }
+
+
 
     static RuntimeValue evaluate(Stmt astNode, Environment env) {
         if(astNode.getKind() != null) {
@@ -175,6 +189,10 @@ public class Interpreter {
                 }
                 case MatchExpr -> {
                     return evaluateMatchExpr((MatchExpr) astNode, env);
+                }
+                case CallExpr -> {
+                    System.out.println(astNode);
+                    return evaluateCallExpr((CallExpr) astNode, env);
                 }
                 case Atom -> {
                     String atomValue = ((Atom) astNode).value;

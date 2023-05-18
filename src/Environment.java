@@ -19,6 +19,11 @@ public class Environment {
         env.declareVariable("null", new RNullValue());
         env.declareVariable("true", new RBooleanValue(true));
         env.declareVariable("false", new RBooleanValue(false));
+
+        env.declareVariable("print", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
+            System.out.println("Hello");
+            return new RNullValue();
+        }));
         return env;
     }
 

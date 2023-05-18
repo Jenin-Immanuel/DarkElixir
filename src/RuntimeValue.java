@@ -5,7 +5,8 @@ enum RuntimeValueType {
     Number,
     Boolean,
     Atom,
-    Tuple
+    Tuple,
+    NativeFunction
 }
 
 public abstract class RuntimeValue {
@@ -106,5 +107,31 @@ class RTupleValue extends RuntimeValue {
     @Override
     public RuntimeValueType getKind() {
         return RuntimeValueType.Tuple;
+    }
+}
+
+@FunctionalInterface
+interface FunctionCall {
+    RuntimeValue call(ArrayList<RuntimeValue> args, Environment env);
+}
+
+
+class RNativeFunction extends RuntimeValue {
+
+    public FunctionCall call;
+
+    public RNativeFunction(FunctionCall call) {
+        this.call = call;
+    }
+
+    public RNativeFunction() {}
+
+    @Override
+    public RuntimeValueType getKind() {
+        return RuntimeValueType.NativeFunction;
+    }
+
+    static RNativeFunction MAKE_NATIVE_FN(FunctionCall call) {
+        return new RNativeFunction(call);
     }
 }
