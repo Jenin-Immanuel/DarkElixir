@@ -1,3 +1,5 @@
+import java.time.Instant;
+import java.util.Date;
 import java.util.HashMap;
 
 public class Environment {
@@ -21,9 +23,19 @@ public class Environment {
         env.declareVariable("false", new RBooleanValue(false));
 
         env.declareVariable("print", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
-            System.out.println("Hello");
+            StringBuilder string = new StringBuilder();
+            for(var arg: args) {
+                string.append(arg).append(" ");
+            }
+            System.out.println(string.toString().trim());
             return new RNullValue();
         }));
+
+        env.declareVariable("date", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
+            System.out.println(Date.from(Instant.now()));
+            return new RNullValue();
+        }));
+
         return env;
     }
 

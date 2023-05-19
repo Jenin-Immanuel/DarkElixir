@@ -1,6 +1,5 @@
-import java.net.IDN;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
+
 
 public class Interpreter {
     static RuntimeValue evaluateProgram(Program program, Environment env) {
@@ -191,7 +190,6 @@ public class Interpreter {
                     return evaluateMatchExpr((MatchExpr) astNode, env);
                 }
                 case CallExpr -> {
-                    System.out.println(astNode);
                     return evaluateCallExpr((CallExpr) astNode, env);
                 }
                 case Atom -> {
