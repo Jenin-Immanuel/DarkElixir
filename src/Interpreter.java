@@ -18,6 +18,9 @@ public class Interpreter {
         if(lhs.getKind() == RuntimeValueType.Number && rhs.getKind() == RuntimeValueType.Number) {
             return evaluateNumericBinaryExpr(((RNumberValue) lhs).number, ((RNumberValue) rhs).number, binExp.op);
         }
+        else if(lhs.getKind() == RuntimeValueType.String && rhs.getKind() == RuntimeValueType.String) {
+            return evaluateStringBinaryExpr((RStringValue) lhs, (RStringValue)rhs, binExp.op);
+        }
         else if(lhs.getKind() == RuntimeValueType.Atom && rhs.getKind() == RuntimeValueType.Atom) {
             return evaluateAtomComparison((RAtomValue) lhs,(RAtomValue) rhs, binExp.op);
         }
@@ -65,6 +68,20 @@ public class Interpreter {
             case "%" -> result.number = lhs % rhs;
         }
         return result;
+    }
+
+    static RStringValue evaluateStringBinaryExpr(RStringValue lhs, RStringValue rhs, String op) {
+        RStringValue res = new RStringValue();
+
+        // Will be extensible
+        switch (op) {
+            case "+" -> res.value = lhs.value + rhs.value;
+            default -> {
+                System.err.println("Invalid operator for strings. Given " + op);
+                System.exit(0);
+            }
+        }
+        return res;
     }
 
     static RuntimeValue evaluateIdentifier(Identifier astNode, Environment env) {

@@ -68,6 +68,8 @@ class RNumberValue extends RuntimeValue {
 class RStringValue extends RuntimeValue {
     public String value;
 
+
+    public RStringValue() {}
     public RStringValue(String value) {
         this.value = value;
     }
@@ -86,7 +88,7 @@ class RStringValue extends RuntimeValue {
 
     @Override
     public String toRawString() {
-        return value;
+        return value.replaceAll("\"", "");
     }
 }
 
