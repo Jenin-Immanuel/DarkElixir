@@ -169,8 +169,6 @@ public class Interpreter {
         return newTuple;
     }
 
-
-
     static RuntimeValue evaluate(Stmt astNode, Environment env) {
         if(astNode.getKind() != null) {
             switch (astNode.getKind()) {
@@ -195,6 +193,9 @@ public class Interpreter {
                 case Atom -> {
                     String atomValue = ((Atom) astNode).value;
                     return new RAtomValue(atomValue);
+                }
+                case StringLiteral -> {
+                    return new RStringValue(((StringLiteral)astNode).value);
                 }
                 case Identifier ->  {
                     return evaluateIdentifier((Identifier) astNode, env);

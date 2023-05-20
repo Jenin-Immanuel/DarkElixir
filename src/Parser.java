@@ -32,7 +32,7 @@ public class Parser {
     public Program produceAst(String code) {
         Lexer lexer = new Lexer(code);
         this.tokens = (ArrayList<Token>) lexer.tokenize();
-        System.out.println(tokens);
+//        System.out.println(tokens);
         Program program = new Program();
         program.body = new ArrayList<Stmt>();
 
@@ -178,6 +178,9 @@ public class Parser {
             case Atom -> {
                 // Removes the ':' from the string so that the value contains the actual value
                 return new Atom(this.eat().value.substring(1));
+            }
+            case String -> {
+                return new StringLiteral(this.eat().value);
             }
             case OpenParen -> {
                 this.eat();

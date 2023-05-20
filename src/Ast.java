@@ -3,6 +3,7 @@ import java.util.ArrayList;
 enum AstNode {
     Program,
     NumericLiteral,
+    StringLiteral,
     Identifier,
     BinaryExpr,
     MatchExpr,
@@ -171,6 +172,28 @@ class Atom extends Expr {
     @Override
     public AstNode getKind() {
         return AstNode.Atom;
+    }
+}
+
+class StringLiteral extends Expr {
+
+    public String value;
+    public StringLiteral() {}
+
+    public StringLiteral(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "StringLiteral{" +
+                "value='" + value + '\'' +
+                '}';
+    }
+
+    @Override
+    public AstNode getKind() {
+        return AstNode.StringLiteral;
     }
 }
 

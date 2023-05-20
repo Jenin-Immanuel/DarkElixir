@@ -18,7 +18,11 @@ public class Main {
 
             Program program = parser.produceAst(prompt);
             var result = Interpreter.evaluateProgram(program, env);
-            System.out.println(result);
+
+            // Don't print if it is a null character
+            if(result.getKind() != RuntimeValueType.Null) {
+                System.out.println(result);
+            }
             line++;
         }
     }

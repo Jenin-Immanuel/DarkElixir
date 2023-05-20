@@ -100,7 +100,6 @@ public class Lexer {
             }
             // FIXME
             else if(src.charAt(i) == '"') {
-                System.out.println("Here");
                 StringBuilder val = new StringBuilder("\"");
                 i++;
                 while(this.borderCheck() && src.charAt(i) != '"') {

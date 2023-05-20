@@ -3,6 +3,7 @@ import java.util.ArrayList;
 enum RuntimeValueType {
     Null,
     Number,
+    String,
     Boolean,
     Atom,
     Tuple,
@@ -61,6 +62,31 @@ class RNumberValue extends RuntimeValue {
     @Override
     public String toRawString() {
         return number.toString();
+    }
+}
+
+class RStringValue extends RuntimeValue {
+    public String value;
+
+    public RStringValue(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "RStringValue{" +
+                "value='" + value + '\'' +
+                '}';
+    }
+
+    @Override
+    public RuntimeValueType getKind() {
+        return RuntimeValueType.String;
+    }
+
+    @Override
+    public String toRawString() {
+        return value;
     }
 }
 
