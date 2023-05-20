@@ -14,6 +14,8 @@ public abstract class RuntimeValue {
 
     public abstract RuntimeValueType getKind();
 
+    public abstract String toRawString();
+
 }
 
 class RNullValue extends RuntimeValue {
@@ -28,6 +30,11 @@ class RNullValue extends RuntimeValue {
     @Override
     public RuntimeValueType getKind() {
         return RuntimeValueType.Null;
+    }
+
+    @Override
+    public String toRawString() {
+        return "";
     }
 }
 
@@ -50,6 +57,11 @@ class RNumberValue extends RuntimeValue {
     public RuntimeValueType getKind() {
         return RuntimeValueType.Number;
     }
+
+    @Override
+    public String toRawString() {
+        return number.toString();
+    }
 }
 
 class RBooleanValue extends RuntimeValue {
@@ -68,6 +80,11 @@ class RBooleanValue extends RuntimeValue {
     public RuntimeValueType getKind() {
         return RuntimeValueType.Boolean;
     }
+
+    @Override
+    public String toRawString() {
+        return value.toString();
+    }
 }
 
 class RAtomValue extends RuntimeValue {
@@ -85,6 +102,11 @@ class RAtomValue extends RuntimeValue {
     @Override
     public RuntimeValueType getKind() {
         return RuntimeValueType.Atom;
+    }
+
+    @Override
+    public String toRawString() {
+        return ":" + value;
     }
 }
 
@@ -108,6 +130,15 @@ class RTupleValue extends RuntimeValue {
     public RuntimeValueType getKind() {
         return RuntimeValueType.Tuple;
     }
+
+    @Override
+    public String toRawString() {
+        StringBuilder val = new StringBuilder("{ ");
+        for(var content: contents) {
+            val.append(content.toRawString());
+        }
+        return val.toString();
+    }
 }
 
 @FunctionalInterface
@@ -129,6 +160,11 @@ class RNativeFunction extends RuntimeValue {
     @Override
     public RuntimeValueType getKind() {
         return RuntimeValueType.NativeFunction;
+    }
+
+    @Override
+    public String toRawString() {
+        return "<native-fn-" + call.toString() + ">";
     }
 
     static RNativeFunction MAKE_NATIVE_FN(FunctionCall call) {
