@@ -1,5 +1,6 @@
 enum TokenType {
     Number,
+    String,
     Identifier,
     Let,
     BinaryOperator,

@@ -32,7 +32,7 @@ public class Parser {
     public Program produceAst(String code) {
         Lexer lexer = new Lexer(code);
         this.tokens = (ArrayList<Token>) lexer.tokenize();
-//        System.out.println(tokens);
+        System.out.println(tokens);
         Program program = new Program();
         program.body = new ArrayList<Stmt>();
 

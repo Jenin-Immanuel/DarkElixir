@@ -30,6 +30,10 @@ public class Lexer {
 
 
     public List<Token> tokenize() {
+
+        // TODO deal with later
+//        String regexString = "\"[^\"]*\"";
+
         List<Token> tokens = new ArrayList<>();
         while(this.i < this.src.length()) {
             if(src.charAt(i) == '(' ) {
@@ -92,6 +96,26 @@ public class Lexer {
                         atom.append(src.charAt(i++));
                 }
                 tokens.add(new Token(atom.toString(), TokenType.Atom));
+                continue;
+            }
+            // FIXME
+            else if(src.charAt(i) == '"') {
+                System.out.println("Here");
+                StringBuilder val = new StringBuilder("\"");
+                i++;
+                while(this.borderCheck() && src.charAt(i) != '"') {
+                    val.append(src.charAt(i++));
+                }
+                if(!borderCheck()) {
+                    System.err.println("Invalid String. Entered expected closing quotes.");
+                    System.exit(0);
+                }
+                if(src.charAt(i) == '"') val.append(src.charAt(i++));
+                else {
+                    System.err.println("Invalid token found " + src.charAt(i));
+                    System.exit(0);
+                }
+                tokens.add(new Token(val.toString(), TokenType.String));
                 continue;
             }
             else {
