@@ -59,7 +59,7 @@ public class Interpreter {
         }
         return result;
     }
-    static RNumberValue evaluateNumericBinaryExpr(Double lhs, Double rhs, String op) {
+    static RuntimeValue evaluateNumericBinaryExpr(Double lhs, Double rhs, String op) {
         RNumberValue result =  new RNumberValue();
         switch (op) {
             case "+" -> result.number = lhs + rhs;
@@ -67,6 +67,22 @@ public class Interpreter {
             case "*" -> result.number = lhs * rhs;
             case "/" -> result.number = lhs / rhs;
             case "%" -> result.number = lhs % rhs;
+            case ">", "<", ">=", "<=", "==", "!=" -> {
+                return evaluateNumericRelationalExpr(lhs, rhs, op);
+            }
+        }
+        return result;
+    }
+
+    static RuntimeValue evaluateNumericRelationalExpr(Double lhs, Double rhs, String op) {
+        RBooleanValue result = new RBooleanValue();
+        switch (op) {
+            case ">" -> result.value = lhs > rhs;
+            case "<" -> result.value = lhs < rhs;
+            case ">=" -> result.value = lhs >= rhs;
+            case "<=" -> result.value = lhs <= rhs;
+            case "==" -> result.value = lhs == rhs;
+            case "!=" -> result.value = lhs != rhs;
         }
         return result;
     }

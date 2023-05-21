@@ -95,6 +95,7 @@ class RStringValue extends RuntimeValue {
 class RBooleanValue extends RuntimeValue {
     public Boolean value;
 
+    public RBooleanValue() {}
     public RBooleanValue(Boolean value) {
         this.value = value;
     }
