@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Parser {
     private ArrayList<Token> tokens = new ArrayList<>();
@@ -165,6 +167,18 @@ public class Parser {
         return args;
     }
 
+    private StringLiteral parseStringLiteral(String val) {
+        StringLiteral res = new StringLiteral(val);
+
+        Pattern pattern = Pattern.compile("#\\{(.*?)}");
+        Matcher matcher = pattern.matcher(val.toString());
+
+        while(matcher.find()) {
+            res.addInterpolatedValue(matcher.group(1));
+        }
+        return res;
+    }
+
     private Expr parsePrimaryExpr() {
         TokenType tk = this.at().type;
 
@@ -180,7 +194,7 @@ public class Parser {
                 return new Atom(this.eat().value.substring(1));
             }
             case String -> {
-                return new StringLiteral(this.eat().value);
+                return parseStringLiteral(this.eat().value);
             }
             case OpenParen -> {
                 this.eat();

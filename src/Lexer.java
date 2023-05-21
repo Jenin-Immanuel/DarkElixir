@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class Lexer {
@@ -26,6 +28,37 @@ public class Lexer {
 
     private boolean borderCheck() {
         return this.i < this.src.length();
+    }
+
+    private Token lexString() {
+        StringBuilder val = new StringBuilder("\"");
+        i++;
+        while(this.borderCheck() && src.charAt(i) != '"') {
+            val.append(src.charAt(i++));
+//            if(src.charAt(i) == '#') {
+//                if(src.charAt(i + 1) == '{') {
+//                    val.append("#{");
+//                    i += 2;
+//                    while(this.borderCheck() && src.charAt(i) != '}')
+//                        val.append(src.charAt(i++));
+//                    val.append(src.charAt(i++));
+//                    if(this.borderCheck() && src.charAt(i) == '"') break;
+//                }
+//            }
+
+        }
+        if(!borderCheck()) {
+            System.err.println("Invalid String. Entered expected closing quotes.");
+            System.exit(0);
+        }
+        if(src.charAt(i) == '"') val.append(src.charAt(i++));
+        else {
+            System.err.println("Invalid token found " + src.charAt(i));
+            System.exit(0);
+        }
+
+
+        return new Token(val.toString(), TokenType.String);
     }
 
 
@@ -100,21 +133,7 @@ public class Lexer {
             }
             // FIXME
             else if(src.charAt(i) == '"') {
-                StringBuilder val = new StringBuilder("\"");
-                i++;
-                while(this.borderCheck() && src.charAt(i) != '"') {
-                    val.append(src.charAt(i++));
-                }
-                if(!borderCheck()) {
-                    System.err.println("Invalid String. Entered expected closing quotes.");
-                    System.exit(0);
-                }
-                if(src.charAt(i) == '"') val.append(src.charAt(i++));
-                else {
-                    System.err.println("Invalid token found " + src.charAt(i));
-                    System.exit(0);
-                }
-                tokens.add(new Token(val.toString(), TokenType.String));
+                tokens.add(this.lexString());
                 continue;
             }
             else {
