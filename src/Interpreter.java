@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 
 public class Interpreter {
@@ -186,6 +187,21 @@ public class Interpreter {
         return newTuple;
     }
 
+    static RuntimeValue evaluateStringLiterals(StringLiteral string, Environment env) {
+        RStringValue newString = new RStringValue(string.value);
+        ArrayList<RuntimeValue> resulantValues = string.getInterpolatedValues().stream().map(arg -> evaluate(arg, env)).collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<String> interpolatedStrings = string.getInterpolatedString();
+
+        if(resulantValues.size() == interpolatedStrings.size()) {
+
+            for(int i = 0; i < resulantValues.size(); i++) {
+                System.out.println("Here");
+                newString.value = newString.value.replace("#{"+ interpolatedStrings.get(i) + "}", resulantValues.get(i).toRawString());
+            }
+        }
+        return newString;
+    }
+
     static RuntimeValue evaluate(Stmt astNode, Environment env) {
         if(astNode.getKind() != null) {
             switch (astNode.getKind()) {
@@ -212,7 +228,8 @@ public class Interpreter {
                     return new RAtomValue(atomValue);
                 }
                 case StringLiteral -> {
-                    return new RStringValue(((StringLiteral)astNode).value);
+//                    return new RStringValue(((StringLiteral)astNode).value);
+                    return evaluateStringLiterals((StringLiteral) astNode, env);
                 }
                 case Identifier ->  {
                     return evaluateIdentifier((Identifier) astNode, env);

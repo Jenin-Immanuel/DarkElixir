@@ -200,6 +200,14 @@ class StringLiteral extends Expr {
         this.interpolatedValues.add(expr);
     }
 
+    public ArrayList<String> getInterpolatedString() {
+        return interpolatedString;
+    }
+
+    public ArrayList<Stmt> getInterpolatedValues() {
+        return interpolatedValues;
+    }
+
     @Override
     public String toString() {
         return "StringLiteral{" +
