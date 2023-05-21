@@ -17,7 +17,6 @@ public class Main {
 
 
             Program program = parser.produceAst(prompt);
-            System.out.println(program.body);
             var result = Interpreter.evaluateProgram(program, env);
 
 

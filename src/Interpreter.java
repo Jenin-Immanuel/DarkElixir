@@ -195,7 +195,6 @@ public class Interpreter {
         if(resulantValues.size() == interpolatedStrings.size()) {
 
             for(int i = 0; i < resulantValues.size(); i++) {
-                System.out.println("Here");
                 newString.value = newString.value.replace("#{"+ interpolatedStrings.get(i) + "}", resulantValues.get(i).toRawString());
             }
         }
