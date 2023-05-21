@@ -34,7 +34,6 @@ public class Parser {
     public Program produceAst(String code) {
         Lexer lexer = new Lexer(code);
         this.tokens = (ArrayList<Token>) lexer.tokenize();
-//        System.out.println(tokens);
         Program program = new Program();
         program.body = new ArrayList<Stmt>();
 
@@ -169,12 +168,14 @@ public class Parser {
 
     private StringLiteral parseStringLiteral(String val) {
         StringLiteral res = new StringLiteral(val);
-
+        Parser tempParser = new Parser();
         Pattern pattern = Pattern.compile("#\\{(.*?)}");
         Matcher matcher = pattern.matcher(val.toString());
         while(matcher.find()) {
             res.addInterpolatedString(matcher.group(1));
-            res.addInterpolatedValue(produceAst(matcher.group(1)).body.isEmpty() ? new Identifier("null") : produceAst(matcher.group(1)).body.get(0));
+            var finalVal = tempParser.produceAst(matcher.group(1)).body;
+            res.addInterpolatedValue(finalVal.isEmpty() ? new Identifier("null") : finalVal.get(0));
+
         }
         return res;
     }
