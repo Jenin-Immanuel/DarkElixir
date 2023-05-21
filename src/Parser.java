@@ -89,6 +89,11 @@ public class Parser {
         return newTuple;
     }
 
+    private Expr parseLogicalExpr() {
+        var left = this.parseRelationalExpr();
+        return left;
+    }
+
     private Expr parseRelationalExpr() {
         var left  = this.parseAdditiveExpr();
         while(this.checkRelationalOperators(this.at().value)) {
@@ -132,7 +137,7 @@ public class Parser {
     }
 
     private Expr parseCallMemberExpr() {
-        var caller = this.parsePrimaryExpr();
+        var caller = this.parseUnaryExpr();
 
         if(this.at().type == TokenType.OpenParen) {
             return this.parseCallExpr(caller);
@@ -145,6 +150,16 @@ public class Parser {
             callExpr = (CallExpr) this.parseCallExpr(callExpr);
         }
         return callExpr;
+    }
+
+    private Expr parseUnaryExpr() {
+        if(this.at().type == TokenType.Minus) {
+            this.eat();
+            var val = this.at();
+            this.expect(TokenType.Number, "Expected number after negative sign. But got " + this.at());
+            return new NumericLiteral(Double.parseDouble(val.value) * -1);
+        }
+        return parsePrimaryExpr();
     }
 
     private ArrayList<Expr> parseArguments() {
@@ -184,6 +199,7 @@ public class Parser {
         TokenType tk = this.at().type;
 
         switch (tk) {
+
             case Identifier -> {
                 return new Identifier(this.eat().value);
             }

@@ -3,6 +3,7 @@ enum TokenType {
     String,
     Identifier,
     Let,
+    Minus,
     BinaryOperator,
     Match,
     OpenParen,

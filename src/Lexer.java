@@ -84,8 +84,13 @@ public class Lexer {
             else if(src.charAt(i) == ',') {
                 tokens.add(new Token(",", TokenType.Comma));
             }
+            // Check for -ve numbers before checking for binary operators
             else if(src.charAt(i) == '+' || src.charAt(i) == '-' || src.charAt(i) == '*' || src.charAt(i) == '/' || src.charAt(i) == '%') {
-                tokens.add(new Token(Character.toString(src.charAt(i)), TokenType.BinaryOperator));
+                if (src.charAt(i) == '-' && (tokens.isEmpty() || tokens.get(tokens.size() - 1).type != TokenType.Number)) {
+                    tokens.add(new Token("-", TokenType.Minus));
+                } else {
+                    tokens.add(new Token(Character.toString(src.charAt(i)), TokenType.BinaryOperator));
+                }
             }
             else if(src.charAt(i) == '<') {
                 if(this.borderCheck() && src.charAt(i + 1) == '=') {

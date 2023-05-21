@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -81,8 +82,8 @@ public class Interpreter {
             case "<" -> result.value = lhs < rhs;
             case ">=" -> result.value = lhs >= rhs;
             case "<=" -> result.value = lhs <= rhs;
-            case "==" -> result.value = lhs == rhs;
-            case "!=" -> result.value = lhs != rhs;
+            case "==" -> result.value = Objects.equals(lhs, rhs);
+            case "!=" -> result.value = !Objects.equals(lhs, rhs);
         }
         return result;
     }
