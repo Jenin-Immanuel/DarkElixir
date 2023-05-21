@@ -178,25 +178,33 @@ class Atom extends Expr {
 class StringLiteral extends Expr {
 
     public String value;
-    private ArrayList<String> interpolatedValues;
+    private ArrayList<String> interpolatedString;
+    private ArrayList<Stmt> interpolatedValues;
 
     public StringLiteral() {
         this.interpolatedValues = new ArrayList<>();
+        this.interpolatedString = new ArrayList<>();
     }
 
     public StringLiteral(String value) {
         this.value = value;
         this.interpolatedValues = new ArrayList<>();
+        this.interpolatedString = new ArrayList<>();
     }
 
-    public void addInterpolatedValue(String val) {
-        this.interpolatedValues.add(val);
+    public void addInterpolatedString(String val) {
+        this.interpolatedString.add(val);
+    }
+
+    public void addInterpolatedValue(Stmt expr) {
+        this.interpolatedValues.add(expr);
     }
 
     @Override
     public String toString() {
         return "StringLiteral{" +
                 "value='" + value + '\'' +
+                ", interpolatedString=" + interpolatedString +
                 ", interpolatedValues=" + interpolatedValues +
                 '}';
     }

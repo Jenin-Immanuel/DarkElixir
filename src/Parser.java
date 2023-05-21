@@ -172,9 +172,9 @@ public class Parser {
 
         Pattern pattern = Pattern.compile("#\\{(.*?)}");
         Matcher matcher = pattern.matcher(val.toString());
-
         while(matcher.find()) {
-            res.addInterpolatedValue(matcher.group(1));
+            res.addInterpolatedString(matcher.group(1));
+            res.addInterpolatedValue(produceAst(matcher.group(1)).body.isEmpty() ? new Identifier("null") : produceAst(matcher.group(1)).body.get(0));
         }
         return res;
     }
