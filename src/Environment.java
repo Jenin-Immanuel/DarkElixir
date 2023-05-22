@@ -1,26 +1,32 @@
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Environment {
     private Environment parent;
     private HashMap<String, RuntimeValue> variables;
 
+    private Set<String> constants;
+
     public Environment() {
         this.parent = null;
         this.variables = new HashMap<>();
+        this.constants = new TreeSet<>();
     }
 
     public Environment(Environment parent) {
         this.parent = parent;
         this.variables = new HashMap<>();
+        this.constants = new TreeSet<>();
     }
 
     public static Environment createGlobalEnvironment() {
         Environment env = new Environment();
-        env.declareVariable("null", new RNullValue());
-        env.declareVariable("true", new RBooleanValue(true));
-        env.declareVariable("false", new RBooleanValue(false));
+        env.declareVariable("null", new RNullValue(), true);
+        env.declareVariable("true", new RBooleanValue(true), true);
+        env.declareVariable("false", new RBooleanValue(false), true);
 
         env.declareVariable("print", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
             StringBuilder string = new StringBuilder();
@@ -29,12 +35,12 @@ public class Environment {
             }
             System.out.println(string.toString().trim());
             return new RNullValue();
-        }));
+        }), true);
 
         env.declareVariable("date", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
             System.out.println(Date.from(Instant.now()));
             return new RNullValue();
-        }));
+        }), true);
 
         return env;
     }
@@ -54,7 +60,12 @@ public class Environment {
         }
         return this.resolveEnvironment(variableName);
     }
+
     public RuntimeValue declareVariable(String variableName, RuntimeValue value) {
+        return declareVariable(variableName, value,false);
+    }
+
+    public RuntimeValue declareVariable(String variableName, RuntimeValue value, Boolean constant) {
         if(this.variables.containsKey(variableName)) {
             this.assignVariable(variableName, value);
             return value;
@@ -62,12 +73,18 @@ public class Environment {
 //            System.exit(0);
         }
         this.variables.put(variableName, value);
+        if(constant) this.constants.add(variableName);
+
         return value;
     }
 
     public RuntimeValue assignVariable(String variableName, RuntimeValue value) {
         var env = this.resolveEnvironment(variableName);
         env.variables.put(variableName, value);
+        if(env.constants.contains(variableName)) {
+            System.err.println("Cannot reassign to variable " + variableName + " as it was declared as a constant");
+            System.exit(0);
+        }
         return value;
     }
 

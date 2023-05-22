@@ -123,10 +123,10 @@ public class Interpreter {
 
                 // Check for constants
 
-                if(asIdentifier.symbol.equals("true") || asIdentifier.symbol.equals("false") || asIdentifier.symbol.equals("null")) {
-                    System.err.println("Invalid LHS of the Match expression. Expected Identifier got " + asIdentifier.symbol);
-                    System.exit(0);
-                }
+//                if(asIdentifier.symbol.equals("true") || asIdentifier.symbol.equals("false") || asIdentifier.symbol.equals("null")) {
+//                    System.err.println("Invalid LHS of the Match expression. Expected Identifier got " + asIdentifier.symbol);
+//                    System.exit(0);
+//                }
 
                 // Assign the new value, if it is present in the current environment
                 if(env.containsVariable(asIdentifier.symbol))
