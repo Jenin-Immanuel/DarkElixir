@@ -23,6 +23,9 @@ enum TokenType {
     Keyword_Else,
     Keyword_Do,
     Keyword_End,
+    Keyword_And,
+    Keyword_Or,
+    Keyword_Not,
     EOF
 }
 

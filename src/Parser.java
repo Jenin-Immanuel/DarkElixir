@@ -31,6 +31,10 @@ public class Parser {
         return op.equals("==") || op.equals("<") || op.equals(">") || op.equals("<=") || op.equals(">=") || op.equals("!=");
     }
 
+    private boolean checkLogicalOperators(String op) {
+        return op.equals("and") || op.equals("or") || op.equals("not");
+    }
+
     public Program produceAst(String code) {
         Lexer lexer = new Lexer(code);
         this.tokens = (ArrayList<Token>) lexer.tokenize();
@@ -67,7 +71,7 @@ public class Parser {
     private Expr parseTupleExpr() {
         // Not a tuple
         if(this.at().type != TokenType.OpenBrace)
-            return parseRelationalExpr();
+            return parseLogicalExpr();
 
         // Eat the open brace
         this.eat();
@@ -91,6 +95,15 @@ public class Parser {
 
     private Expr parseLogicalExpr() {
         var left = this.parseRelationalExpr();
+        while(this.checkLogicalOperators(this.at().value)) {
+            var op = this.eat().value;
+            var right = this.parseRelationalExpr();
+            var binExp = new BinaryExpr();
+            binExp.left = left;
+            binExp.right = right;
+            binExp.op = op;
+            left = binExp;
+        }
         return left;
     }
 

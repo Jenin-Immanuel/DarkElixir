@@ -24,6 +24,9 @@ public class Lexer {
         KEYWORDS.put("else", TokenType.Keyword_Else);
         KEYWORDS.put("do", TokenType.Keyword_Do);
         KEYWORDS.put("end", TokenType.Keyword_End);
+        KEYWORDS.put("and", TokenType.Keyword_And);
+        KEYWORDS.put("or", TokenType.Keyword_Or);
+        KEYWORDS.put("not", TokenType.Keyword_Not);
     }
 
     private boolean borderCheck() {

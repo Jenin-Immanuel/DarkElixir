@@ -1,9 +1,21 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 
 public class Interpreter {
+
+    static Boolean equivalentBoolean(RuntimeValue val) {
+        switch (val.getKind()) {
+            case Boolean -> {
+                return ((RBooleanValue) val).value;
+            }
+            case Null -> { return false; }
+        }
+        return true;
+    }
     static RuntimeValue evaluateProgram(Program program, Environment env) {
         RuntimeValue lastEvaluated = new RNullValue();
         for(Stmt stmt: program.body) {
@@ -16,17 +28,42 @@ public class Interpreter {
         var lhs = evaluate(binExp.left, env);
         var rhs = evaluate(binExp.right, env);
 
+        HashMap<String, Supplier<RuntimeValue>> functionMap = new HashMap<>();
+        functionMap.put("Number-Number", () -> evaluateNumericBinaryExpr(((RNumberValue) lhs), ((RNumberValue) rhs), binExp.op));
+        functionMap.put("String-String", () -> evaluateStringBinaryExpr((RStringValue) lhs, (RStringValue) rhs, binExp.op));
+        functionMap.put("Number-String", () -> evaluateNumberStringOps((RNumberValue) lhs, (RStringValue) rhs, binExp.op));
+        functionMap.put("String-Number", () -> evaluateNumberStringOps((RStringValue) lhs, (RNumberValue) rhs, binExp.op));
+        functionMap.put("Atom-Atom", () -> evaluateAtomComparison((RAtomValue) lhs, (RAtomValue) rhs, binExp.op));
 
-        if(lhs.getKind() == RuntimeValueType.Number && rhs.getKind() == RuntimeValueType.Number) {
-            return evaluateNumericBinaryExpr(((RNumberValue) lhs).number, ((RNumberValue) rhs).number, binExp.op);
-        }
-        else if(lhs.getKind() == RuntimeValueType.String && rhs.getKind() == RuntimeValueType.String) {
-            return evaluateStringBinaryExpr((RStringValue) lhs, (RStringValue)rhs, binExp.op);
-        }
-        else if(lhs.getKind() == RuntimeValueType.Atom && rhs.getKind() == RuntimeValueType.Atom) {
-            return evaluateAtomComparison((RAtomValue) lhs,(RAtomValue) rhs, binExp.op);
-        }
+        String key = lhs.getKind().toString() + "-" + rhs.getKind().toString();
+        if (functionMap.containsKey(key)) return functionMap.get(key).get();
+
         return new RNullValue();
+    }
+
+    static RuntimeValue evaluateNumberStringOps(RStringValue lhs, RNumberValue rhs, String op) {
+        RStringValue res = new RStringValue();
+        switch (op) {
+            case "+" -> res.value = lhs.toRawString() + rhs.number;
+            default -> {
+                System.err.println("Invalid Operation " + op + " on String and Number.");
+                System.exit(0);
+            }
+        }
+        return res;
+    }
+
+    static RuntimeValue evaluateNumberStringOps(RNumberValue lhs, RStringValue rhs, String op) {
+        RStringValue res = new RStringValue();
+        switch (op) {
+            case "+" -> res.value = lhs.number + rhs.toRawString();
+            default -> {
+                System.err.println("Invalid Operation " + op + " on String and Number.");
+                System.exit(0);
+            }
+        }
+
+        return res;
     }
 
     static RuntimeValue evaluateAtomComparison(RAtomValue lhs, RAtomValue rhs, String op) {
@@ -60,21 +97,45 @@ public class Interpreter {
         }
         return result;
     }
-    static RuntimeValue evaluateNumericBinaryExpr(Double lhs, Double rhs, String op) {
+    static RuntimeValue evaluateNumericBinaryExpr(RNumberValue lhs, RNumberValue rhs, String op) {
         RNumberValue result =  new RNumberValue();
+
         switch (op) {
-            case "+" -> result.number = lhs + rhs;
-            case "-" -> result.number = lhs - rhs;
-            case "*" -> result.number = lhs * rhs;
-            case "/" -> result.number = lhs / rhs;
-            case "%" -> result.number = lhs % rhs;
+            case "+" -> result.number = lhs.number + rhs.number;
+            case "-" -> result.number = lhs.number - rhs.number;
+            case "*" -> result.number = lhs.number * rhs.number;
+            case "/" -> result.number = lhs.number / rhs.number;
+            case "%" -> result.number = lhs.number % rhs.number;
             case ">", "<", ">=", "<=", "==", "!=" -> {
-                return evaluateNumericRelationalExpr(lhs, rhs, op);
+                return evaluateNumericRelationalExpr(lhs.number, rhs.number, op);
+            }
+            case "and", "or" -> {
+                return evaluateLogicalExpr(lhs, rhs, op);
             }
         }
         return result;
     }
 
+    static RuntimeValue evaluateLogicalExpr(RuntimeValue lhs, RuntimeValue rhs, String op) {
+        RBooleanValue res = new RBooleanValue();
+        var leftBool = equivalentBoolean(lhs);
+        switch (op) {
+            case "and" -> {
+                if(leftBool)
+                    return rhs;
+                return lhs;
+            }
+            case "or" -> {
+                if(leftBool)
+                    return lhs;
+                return rhs;
+            }
+            default -> {
+                System.err.println("Invalid Operation for " + lhs.toRawString() + " and " + rhs.toRawString() + ". Given operation: " + op);
+            }
+        }
+        return res;
+    }
     static RuntimeValue evaluateNumericRelationalExpr(Double lhs, Double rhs, String op) {
         RBooleanValue result = new RBooleanValue();
         switch (op) {
