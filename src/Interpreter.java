@@ -28,6 +28,8 @@ public class Interpreter {
         var lhs = evaluate(binExp.left, env);
         var rhs = evaluate(binExp.right, env);
 
+        if(Objects.equals(binExp.op, "and") || Objects.equals(binExp.op, "or")) return evaluateLogicalExpr(lhs, rhs, binExp.op);
+
         HashMap<String, Supplier<RuntimeValue>> functionMap = new HashMap<>();
         functionMap.put("Number-Number", () -> evaluateNumericBinaryExpr(((RNumberValue) lhs), ((RNumberValue) rhs), binExp.op));
         functionMap.put("String-String", () -> evaluateStringBinaryExpr((RStringValue) lhs, (RStringValue) rhs, binExp.op));
