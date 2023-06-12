@@ -38,9 +38,9 @@ public class Parser {
     public Program produceAst(String code) {
         Lexer lexer = new Lexer(code);
         this.tokens = (ArrayList<Token>) lexer.tokenize();
+        System.out.println(tokens);
         Program program = new Program();
         program.body = new ArrayList<Stmt>();
-
         while(not_eof()) {
             program.body.add(this.parseStmt());
         }
@@ -48,7 +48,68 @@ public class Parser {
     }
 
     private Stmt parseStmt() {
-        return this.parseExpr();
+        switch(this.at().type) {
+            case Keyword_If -> {
+                return this.parseIfStatement();
+            }
+            default -> {
+                return this.parseExpr();
+            }
+        }
+
+    }
+
+    private Stmt parseIfStatement() {
+        IfStatement ifStatement = new IfStatement();
+
+        this.expect(TokenType.Keyword_If, "Expected keyword for conditional statements: IF");
+
+        // Expecting a condition
+        var condition = this.getExpressionInParenthesis();
+
+        // Expect a block
+        this.expect(TokenType.Keyword_Do, "Expected keyword: do");
+
+        ArrayList<Stmt> block = new ArrayList<>();
+        while(this.at().type != TokenType.Keyword_Elif && this.at().type != TokenType.Keyword_Else && this.at().type != TokenType.Keyword_End) {
+            // Parse statements
+            block.add(this.parseStmt());
+        }
+        ifStatement.clauses.add(new IfNode(condition, block, false));
+
+        System.out.println("Here");
+        while(this.at().type != TokenType.Keyword_End) {
+            if(this.at().type == TokenType.Keyword_Elif) {
+                this.expect(TokenType.Keyword_Elif, "Expected keyword for conditional statements: ELIF");
+                condition = this.getExpressionInParenthesis();
+                this.expect(TokenType.Keyword_Do, "Expected keyword: do");
+                block = new ArrayList<>();
+                while(this.at().type != TokenType.Keyword_Elif && this.at().type != TokenType.Keyword_Else && this.at().type != TokenType.Keyword_End) {
+                    // Parse statements
+                    block.add(this.parseStmt());
+                }
+                ifStatement.clauses.add(new IfNode(condition, block, false));
+            }
+            else if(this.at().type == TokenType.Keyword_Else) {
+                this.expect(TokenType.Keyword_Else, "Expected keyword for conditional statements: Else");
+                block = new ArrayList<>();
+                while(this.at().type != TokenType.Keyword_Elif && this.at().type != TokenType.Keyword_Else && this.at().type != TokenType.Keyword_End) {
+                    block.add(this.parseStmt());
+                }
+                ifStatement.clauses.add(new IfNode(block, true));
+                break;
+            }
+        }
+        this.expect(TokenType.Keyword_End, "Expected keyword after the conditional statement: END");
+
+        return ifStatement;
+    }
+
+    private Expr getExpressionInParenthesis() {
+        this.expect(TokenType.OpenParen, "Expected token: (");
+        var condition = this.parseExpr();
+        this.expect(TokenType.CloseParen, "Expected token: )");
+        return condition;
     }
     private Expr parseExpr() {
         return this.parseMatchExpr();

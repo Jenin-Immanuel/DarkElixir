@@ -20,6 +20,7 @@ enum TokenType {
     NotEqual,
     Not,
     Keyword_If,
+    Keyword_Elif,
     Keyword_Else,
     Keyword_Do,
     Keyword_End,

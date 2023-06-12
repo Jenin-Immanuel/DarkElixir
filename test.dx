@@ -1,4 +1,8 @@
 x = 5
-x = x + 5
-print(x)
-print("New man")
+if (x < 10) do
+    print(x)
+elif (x < 5) do
+    print(x)
+else
+    print("Not found")
+end

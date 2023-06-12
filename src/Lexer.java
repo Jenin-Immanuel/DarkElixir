@@ -21,6 +21,7 @@ public class Lexer {
         KEYWORDS = new HashMap<>();
         KEYWORDS.put("let", TokenType.Let);
         KEYWORDS.put("if", TokenType.Keyword_If);
+        KEYWORDS.put("elif", TokenType.Keyword_Elif);
         KEYWORDS.put("else", TokenType.Keyword_Else);
         KEYWORDS.put("do", TokenType.Keyword_Do);
         KEYWORDS.put("end", TokenType.Keyword_End);

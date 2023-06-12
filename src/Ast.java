@@ -9,8 +9,8 @@ enum AstNode {
     MatchExpr,
     CallExpr,
     Atom,
-    Tuple
-
+    Tuple,
+    IfStatement
 }
 
 abstract class Stmt {
@@ -242,5 +242,58 @@ class Tuple extends Expr {
     @Override
     public AstNode getKind() {
         return AstNode.Tuple;
+    }
+}
+
+class IfStatement extends Stmt {
+    public ArrayList<IfNode> clauses;
+
+    public IfStatement() {
+        this.clauses = new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        return "IfStatement{" +
+                "clauses=" + clauses +
+                '}';
+    }
+
+    @Override
+    public AstNode getKind() {
+        return AstNode.IfStatement;
+    }
+}
+
+class IfNode extends Stmt {
+    public Expr condition;
+    public ArrayList<Stmt> block;
+    public Boolean isElse;
+
+    public IfNode(Expr condition, ArrayList<Stmt> block, Boolean isElse) {
+        this.condition = condition;
+        this.block = block;
+        this.isElse = isElse;
+    }
+
+    public IfNode(ArrayList<Stmt> block, Boolean isElse) {
+        this.block = block;
+        this.isElse = isElse;
+    }
+
+    public IfNode() {}
+
+    @Override
+    public String toString() {
+        return "IfNode{" +
+                "condition=" + condition +
+                ", block=" + block +
+                ", isElse=" + isElse +
+                '}';
+    }
+
+    @Override
+    public AstNode getKind() {
+        return AstNode.IfStatement;
     }
 }
