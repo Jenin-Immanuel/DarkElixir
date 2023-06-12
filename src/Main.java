@@ -1,5 +1,38 @@
+import java.io.*;
 import java.util.Scanner;
 public class Main {
+
+    static void run(String filePath) {
+        StringBuilder sourceCode = new StringBuilder();
+        try {
+            File Obj = new File(filePath);
+            Scanner Reader = new Scanner(Obj);
+            while (Reader.hasNextLine()) {
+                if(sourceCode.isEmpty()) {
+                    sourceCode.append(Reader.nextLine());
+                }
+                else {
+                    sourceCode.append("\n").append(Reader.nextLine());
+                }
+            }
+            Reader.close();
+        }
+        catch (FileNotFoundException e) {
+            System.out.println("An error has occurred.");
+            e.printStackTrace();
+        }
+
+        Parser parser = new Parser();
+
+        // The environment scope for the global variables
+        Environment env = Environment.createGlobalEnvironment();
+
+        Program program = parser.produceAst(sourceCode.toString());
+        var result = Interpreter.evaluateProgram(program, env);
+        if(result.getKind() != RuntimeValueType.Null) {
+            System.out.println(result);
+        }
+    }
     static void repl() {
         Scanner sc = new Scanner(System.in);
         Parser parser = new Parser();
@@ -28,6 +61,6 @@ public class Main {
         }
     }
     public static void main(String[] args) {
-        repl();
+        run("test.dx");
     }
 }

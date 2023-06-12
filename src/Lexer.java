@@ -161,11 +161,11 @@ public class Lexer {
 
                     tokens.add(new Token(ident.toString(), KEYWORDS.getOrDefault(ident.toString(), TokenType.Identifier)));
                 }
-                else if(Character.isSpaceChar(src.charAt(i))) {
+                else if(Character.isSpaceChar(src.charAt(i)) || (int) src.charAt(i) == 10) {
                     i++;
                 }
                 else {
-                    System.err.println("Unrecognized character: " + src.charAt(i));
+                    System.err.println("Unrecognized character: " + (int) src.charAt(i));
                     System.exit(0);
                 }
                 continue;
