@@ -22,6 +22,18 @@ public class Environment {
         this.constants = new TreeSet<>();
     }
 
+    public Environment getParent() {
+        return parent;
+    }
+
+    public HashMap<String, RuntimeValue> getVariables() {
+        return variables;
+    }
+
+    public Set<String> getConstants() {
+        return constants;
+    }
+
     public static Environment createGlobalEnvironment() {
         Environment env = new Environment();
         env.declareVariable("null", new RNullValue(), true);
@@ -58,7 +70,7 @@ public class Environment {
         if(this.parent == null) {
             return null;
         }
-        return this.resolveEnvironment(variableName);
+        return this.parent.safeResolveEnvironment(variableName);
     }
 
     public RuntimeValue declareVariable(String variableName, RuntimeValue value) {
@@ -89,6 +101,7 @@ public class Environment {
     }
 
     public RuntimeValue lookupVariable(String variableName) {
+
         var env = this.resolveEnvironment(variableName);
         return env.variables.get(variableName);
     }
@@ -101,6 +114,6 @@ public class Environment {
             System.err.println("Cannot resolve variable " + variableName + " as it doesn't exist.");
             System.exit(0);
         }
-        return this.resolveEnvironment(variableName);
+        return this.parent.resolveEnvironment(variableName);
     }
 }

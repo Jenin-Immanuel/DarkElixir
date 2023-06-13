@@ -28,12 +28,7 @@ public class Main {
         Environment env = Environment.createGlobalEnvironment();
 
         Program program = parser.produceAst(sourceCode.toString());
-        System.out.println(program.body);
-        System.out.println(program.body.size());
         var result = Interpreter.evaluateProgram(program, env);
-        if(result.getKind() != RuntimeValueType.Null) {
-            System.out.println(result);
-        }
     }
     static void repl() {
         Scanner sc = new Scanner(System.in);

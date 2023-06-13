@@ -281,6 +281,41 @@ public class Interpreter {
         return newString;
     }
 
+    // Evaluate body of statements
+    static void evaluateBody(ArrayList<Stmt> body, Environment env) {
+        RuntimeValue lastEvaluated = new RNullValue();
+        var scope = new Environment(env);
+        for(var stmt: body){
+            lastEvaluated = evaluate(stmt, scope);
+        }
+    }
+
+    // Evaluate If clause
+    static Boolean evaluateIfClause(IfNode ifNode, Environment env) {
+        if(ifNode.isElse) {
+            evaluateBody(ifNode.block, env);
+            return true;
+        }
+        var condition = evaluate(ifNode.condition, env);
+        if(condition.getKind() == RuntimeValueType.Boolean){
+            // If the condition is false
+            if(!((RBooleanValue) condition).value) return false;
+        }
+
+        evaluateBody(ifNode.block, env);
+        return true;
+    }
+
+    // Evaluating If statement
+    static RuntimeValue evaluateIfStatement(IfStatement ifStatement, Environment env) {
+        var clauses = ifStatement.clauses;
+        for(IfNode clause: clauses) {
+            Boolean isEvaluated = evaluateIfClause(clause, env);
+            if(isEvaluated) break;
+        }
+        return new RBooleanValue(true);
+    }
+
     static RuntimeValue evaluate(Stmt astNode, Environment env) {
         if(astNode.getKind() != null) {
             switch (astNode.getKind()) {
@@ -289,6 +324,9 @@ public class Interpreter {
                     NumericLiteral asNumber = (NumericLiteral) astNode;
                     number.number = asNumber.value;
                     return number;
+                }
+                case IfStatement -> {
+                    return evaluateIfStatement((IfStatement) astNode, env);
                 }
                 case Program -> {
                     return evaluateProgram((Program) astNode, env);

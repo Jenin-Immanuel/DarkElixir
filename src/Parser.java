@@ -38,7 +38,6 @@ public class Parser {
     public Program produceAst(String code) {
         Lexer lexer = new Lexer(code);
         this.tokens = (ArrayList<Token>) lexer.tokenize();
-        System.out.println(tokens);
         Program program = new Program();
         program.body = new ArrayList<Stmt>();
         while(not_eof()) {
@@ -77,7 +76,6 @@ public class Parser {
         }
         ifStatement.clauses.add(new IfNode(condition, block, false));
 
-        System.out.println("Here");
         while(this.at().type != TokenType.Keyword_End) {
             if(this.at().type == TokenType.Keyword_Elif) {
                 this.expect(TokenType.Keyword_Elif, "Expected keyword for conditional statements: ELIF");

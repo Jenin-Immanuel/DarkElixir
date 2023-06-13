@@ -7,7 +7,9 @@ enum RuntimeValueType {
     Boolean,
     Atom,
     Tuple,
-    NativeFunction
+    NativeFunction,
+    IfStatement,
+    IfNode
 }
 
 public abstract class RuntimeValue {
@@ -61,6 +63,9 @@ class RNumberValue extends RuntimeValue {
 
     @Override
     public String toRawString() {
+        if((number*10) % 10 == 0) {
+            return String.valueOf(number.intValue());
+        }
         return number.toString();
     }
 }
@@ -198,5 +203,51 @@ class RNativeFunction extends RuntimeValue {
 
     static RNativeFunction MAKE_NATIVE_FN(FunctionCall call) {
         return new RNativeFunction(call);
+    }
+}
+
+class RIfNode extends RuntimeValue {
+
+    public Expr conditionResult;
+    public ArrayList<Stmt> body;
+    public RBooleanValue isElse;
+
+    public RIfNode(Expr conditionResult, ArrayList<Stmt> body, RBooleanValue isElse) {
+        this.conditionResult = conditionResult;
+        this.body = body;
+        this.isElse = isElse;
+    }
+
+    public RIfNode() {}
+
+    @Override
+    public RuntimeValueType getKind() {
+        return RuntimeValueType.IfNode;
+    }
+
+    @Override
+    public String toRawString() {
+        return null;
+    }
+}
+
+class RIfStatement extends RuntimeValue {
+
+    public ArrayList<RIfNode> clauses;
+
+    public RIfStatement() {}
+
+    public RIfStatement(ArrayList<RIfNode> clauses) {
+        this.clauses = clauses;
+    }
+
+    @Override
+    public RuntimeValueType getKind() {
+        return RuntimeValueType.IfStatement;
+    }
+
+    @Override
+    public String toRawString() {
+        return null;
     }
 }
