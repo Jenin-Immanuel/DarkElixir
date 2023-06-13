@@ -27,6 +27,7 @@ enum TokenType {
     Keyword_And,
     Keyword_Or,
     Keyword_Not,
+    Keyword_Def,
     EOF
 }
 

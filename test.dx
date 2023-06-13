@@ -1,16 +1,5 @@
-x = 5
-y = 1
-print(x)
-if (x > 10) do
-    print(x)
-elif (x <= 5) do
-    z = 1
-    if (x == 5) do
-        x = 6
-        print(z)
-    end
-else
-    print("Not found")
+def fun(x, y) do
+    print(x + y)
 end
-print(x)
 
+fun(1, 2)

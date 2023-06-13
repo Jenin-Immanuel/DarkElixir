@@ -252,11 +252,29 @@ public class Interpreter {
     static  RuntimeValue evaluateCallExpr(CallExpr expr, Environment env) {
         var args = expr.args.stream().map(arg -> evaluate(arg, env)).toList();
         var fn = evaluate(expr.caller, env);
-        if(fn.getKind() != RuntimeValueType.NativeFunction) {
-            System.err.println("Cannot call a value which is not a native function " + fn);
-            System.exit(0);
+        if(fn.getKind() == RuntimeValueType.NativeFunction) {
+            return ((RNativeFunction) fn).call.call(new ArrayList<>(args), env);
         }
-        return ((RNativeFunction) fn).call.call(new ArrayList<>(args), env);
+        if(fn.getKind() == RuntimeValueType.FunctionValue) {
+            var fnValue = (RFunctionValue) fn;
+
+            // Declare a new scope with current env as the parent
+            var scope = new Environment(fnValue.declarationEnv);
+
+            // Set the parameters as vars in the current scope
+            for(int i = 0; i < fnValue.parameters.size(); i++) {
+//                System.out.println(fnValue.parameters.get(i).toString() + " " + args.get(i));
+                scope.declareVariable(((Identifier)fnValue.parameters.get(i)).symbol, args.get(i), false);
+            }
+            RuntimeValue result = new RNullValue();
+            for(var stmt: fnValue.body) {
+                result = evaluate(stmt, scope);
+            }
+            return result;
+        }
+        System.err.println("Cannot call a value which is not a native function " + fn);
+        System.exit(0);
+        return new RNullValue();
     }
 
     static RuntimeValue evaluateTuple(Tuple tuple, Environment env) {
@@ -316,6 +334,11 @@ public class Interpreter {
         return new RBooleanValue(true);
     }
 
+    static RuntimeValue evaluateFunctionValue(FunctionDeclaration fd, Environment env) {
+        var fnValue = new RFunctionValue(fd.functionName, fd.parameters, fd.body, env);
+        return env.declareVariable(fd.functionName, fnValue, false);
+    }
+
     static RuntimeValue evaluate(Stmt astNode, Environment env) {
         if(astNode.getKind() != null) {
             switch (astNode.getKind()) {
@@ -353,6 +376,9 @@ public class Interpreter {
                 }
                 case Tuple -> {
                     return evaluateTuple((Tuple) astNode, env);
+                }
+                case FunctionDeclaration -> {
+                    return evaluateFunctionValue((FunctionDeclaration) astNode, env);
                 }
                 default -> {
                     System.err.println("This AST Node has not yet been setup for interpretation. " + astNode);

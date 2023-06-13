@@ -10,7 +10,8 @@ enum AstNode {
     CallExpr,
     Atom,
     Tuple,
-    IfStatement
+    IfStatement,
+    FunctionDeclaration
 }
 
 abstract class Stmt {
@@ -295,5 +296,42 @@ class IfNode extends Stmt {
     @Override
     public AstNode getKind() {
         return AstNode.IfStatement;
+    }
+}
+
+class FunctionDeclaration extends Stmt {
+    public String functionName;
+    public ArrayList<Expr> parameters;
+    public ArrayList<Stmt> body;
+
+    public FunctionDeclaration(String functionName, ArrayList<Expr> parameters, ArrayList<Stmt> body) {
+        this.functionName = functionName;
+        this.parameters = parameters;
+        this.body = body;
+    }
+
+    public FunctionDeclaration(String functionName) {
+        this.functionName = functionName;
+        this.parameters = new ArrayList<>();
+        this.body = new ArrayList<>();
+    }
+
+    public FunctionDeclaration() {
+        this.parameters = new ArrayList<>();
+        this.body = new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        return "FunctionDeclaration{" +
+                "functionName='" + functionName + '\'' +
+                ", parameters=" + parameters +
+                ", body=" + body +
+                '}';
+    }
+
+    @Override
+    public AstNode getKind() {
+        return AstNode.FunctionDeclaration;
     }
 }

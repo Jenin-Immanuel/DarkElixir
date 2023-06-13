@@ -9,7 +9,8 @@ enum RuntimeValueType {
     Tuple,
     NativeFunction,
     IfStatement,
-    IfNode
+    IfNode,
+    FunctionValue
 }
 
 public abstract class RuntimeValue {
@@ -203,6 +204,32 @@ class RNativeFunction extends RuntimeValue {
 
     static RNativeFunction MAKE_NATIVE_FN(FunctionCall call) {
         return new RNativeFunction(call);
+    }
+}
+
+class RFunctionValue extends RuntimeValue {
+    public String functionName;
+    public ArrayList<Expr> parameters;
+    public ArrayList<Stmt> body;
+    public Environment declarationEnv;
+
+    public RFunctionValue(String functionName, ArrayList<Expr> parameters, ArrayList<Stmt> body, Environment declarationEnv) {
+        this.functionName = functionName;
+        this.parameters = parameters;
+        this.body = body;
+        this.declarationEnv = declarationEnv;
+    }
+
+    public RFunctionValue() {}
+
+    @Override
+    public RuntimeValueType getKind() {
+        return RuntimeValueType.FunctionValue;
+    }
+
+    @Override
+    public String toRawString() {
+        return null;
     }
 }
 

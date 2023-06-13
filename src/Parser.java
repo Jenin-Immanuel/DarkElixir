@@ -51,11 +51,37 @@ public class Parser {
             case Keyword_If -> {
                 return this.parseIfStatement();
             }
+            case Keyword_Def -> {
+                return this.parseFunctionDeclaration();
+            }
             default -> {
                 return this.parseExpr();
             }
         }
 
+    }
+
+    private Stmt parseFunctionDeclaration() {
+        FunctionDeclaration fd = new FunctionDeclaration();
+        this.expect(TokenType.Keyword_Def, "Expected keyword DEF for function declaration: Given " + this.at());
+        fd.functionName = this.eat().value;
+        fd.parameters = this.parseArguments();
+
+        // Make sure all the parameters are Identifiers
+        for(var parameter: fd.parameters) {
+            if(parameter.getKind() != AstNode.Identifier) {
+                System.err.println("Only Identifiers can be given as parameters. Given " + parameter.getKind());
+            }
+        }
+
+        // Declare block
+        this.expect(TokenType.Keyword_Do, "Expected keyword DO. Given " + this.at());
+        while(this.at().type != TokenType.Keyword_End && this.at().type != TokenType.EOF) {
+            fd.body.add(this.parseStmt());
+        }
+        this.expect(TokenType.Keyword_End, "Expected keyword END at the end of function declaration. Given " + this.at());
+
+        return fd;
     }
 
     private Stmt parseIfStatement() {
