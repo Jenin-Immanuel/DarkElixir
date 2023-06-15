@@ -149,7 +149,7 @@ public class Parser {
 
     private Expr parseMatchExpr() {
         // toAssigned value
-        var left = this.parseTupleExpr();
+        var left = this.parseDataStructure();
         if(this.at().type == TokenType.Match) {
             // Go through the match operator
             this.eat();
@@ -159,8 +159,19 @@ public class Parser {
         return left;
     }
 
-
-    //
+    private Expr parseDataStructure() {
+        switch(this.at().type) {
+            case OpenBrace -> {
+                return this.parseTupleExpr();
+            }
+            case OpenSquare -> {
+                return this.parseListExpr();
+            }
+            default -> {
+                return parseLogicalExpr();
+            }
+        }
+    }
     private Expr parseTupleExpr() {
         // Not a tuple
         if(this.at().type != TokenType.OpenBrace)
@@ -184,6 +195,27 @@ public class Parser {
         // Eat the close brace
         this.expect(TokenType.CloseBrace, "Expected trailing Closing Brackets. But got " + this.at());
         return newTuple;
+    }
+
+    private Expr parseListExpr() {
+        // Eat the open brace
+        this.expect(TokenType.OpenSquare, "Expected Open Square Bracket for list, But got " + this.at());
+
+        var newList = new ListStructure();
+
+        // Examples
+        // [ 1, 2, 3 ]
+        // [ 1 ]
+        while(this.not_eof() && this.at().type != TokenType.CloseSquare) {
+            var value = this.parseMatchExpr();
+            newList.contents.add(value);
+            if(this.at().type != TokenType.CloseBrace) {
+                this.expect(TokenType.Comma, "Expected TokenType Comma, But got " + this.at());
+            }
+        }
+        // Eat the close brace
+        this.expect(TokenType.CloseSquare, "Expected trailing Closing Square Brackets. But got " + this.at());
+        return newList;
     }
 
     private Expr parseLogicalExpr() {

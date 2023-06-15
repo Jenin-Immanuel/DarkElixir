@@ -10,6 +10,7 @@ enum AstNode {
     CallExpr,
     Atom,
     Tuple,
+    List,
     IfStatement,
     FunctionDeclaration,
     ReturnStatement
@@ -244,6 +245,26 @@ class Tuple extends Expr {
     @Override
     public AstNode getKind() {
         return AstNode.Tuple;
+    }
+}
+
+class ListStructure extends Expr {
+    public ArrayList<Expr> contents;
+
+    public ListStructure() {
+        this.contents = new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        return "ListStructure{" +
+                "contents=" + contents +
+                '}';
+    }
+
+    @Override
+    public AstNode getKind() {
+        return AstNode.List;
     }
 }
 

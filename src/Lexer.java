@@ -87,6 +87,12 @@ public class Lexer {
             else if(src.charAt(i) == '}') {
                 tokens.add(new Token("}", TokenType.CloseBrace));
             }
+            else if(src.charAt(i) == '[') {
+                tokens.add(new Token("[", TokenType.OpenSquare));
+            }
+            else if(src.charAt(i) == ']') {
+                tokens.add(new Token("]", TokenType.CloseSquare));
+            }
             else if(src.charAt(i) == ',') {
                 tokens.add(new Token(",", TokenType.Comma));
             }

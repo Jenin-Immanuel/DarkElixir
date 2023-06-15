@@ -1,9 +1,1 @@
-def fun(x, y) do
-    if (y == 2) do
-        print("Here")
-    end
-    return x + y
-end
-
-x = fun(1, 2)
-print(x)
+x = {1, 2}

@@ -10,6 +10,8 @@ enum TokenType {
     CloseParen,
     OpenBrace,
     CloseBrace,
+    OpenSquare,
+    CloseSquare,
     Atom,
     Comma,
     Equals,

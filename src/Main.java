@@ -28,6 +28,7 @@ public class Main {
         Environment env = Environment.createGlobalEnvironment();
 
         Program program = parser.produceAst(sourceCode.toString());
+        System.out.println(program.body);
         var result = Interpreter.evaluateProgram(program, env);
     }
     static void repl() {
