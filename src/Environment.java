@@ -1,8 +1,7 @@
 import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class Environment {
     private Environment parent;
@@ -55,24 +54,32 @@ public class Environment {
         }), true);
 
         // Tuple functions
-        /**
-         * Arguments
-         * Tuple name / tuple itself
+
+        /*
+          Arguments
+          Tuple name / tuple itself
          */
-        env.declareVariable("t_size", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
+        env.declareVariable("len", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
             if(args.size() != 1) {
-                System.err.println("Invalid Arguments: t_size/1 function accepts only two arguments");
+                System.err.println("Invalid Arguments: len/1 function accepts only two arguments");
                 System.exit(0);
             }
+            RuntimeValue arg = args.get(0);
+            switch(arg.getKind()) {
+                case Tuple -> {
+                    return new RNumberValue((double) ((RTupleValue) arg).contents.size());
+                }
+                case List -> {
+                    return new RNumberValue((double) ((RListValue) arg).contents.size());
+                }
+                case String -> {
+                    return new RNumberValue((double) ((RStringValue) arg).value.length() - 2); // Remove the double quotes
+                }
 
-            // Make sure that the give argument is a tuple
-            if(args.get(0).getKind() != RuntimeValueType.Tuple) {
-                System.err.println("Invalid Argument: t_size <tuple>");
-                System.exit(0);
             }
-
-            RTupleValue tupleValue = (RTupleValue) args.get(0);
-            return new RNumberValue((double) tupleValue.contents.size());
+            System.err.println("Invalid argument for len function, Given " + arg.getKind());
+            System.exit(0);
+            return new RNullValue();
         }));
 
         return env;

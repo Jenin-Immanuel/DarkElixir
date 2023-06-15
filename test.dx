@@ -1,2 +1,6 @@
 x = [1, 2]
-print(t_size(x))
+print(len(x))
+y = {1, 2}
+print(len(y))
+z = "String"
+print(len(z))
