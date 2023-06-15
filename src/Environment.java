@@ -54,6 +54,27 @@ public class Environment {
             return new RNullValue();
         }), true);
 
+        // Tuple functions
+        /**
+         * Arguments
+         * Tuple name / tuple itself
+         */
+        env.declareVariable("t_size", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
+            if(args.size() != 1) {
+                System.err.println("Invalid Arguments: t_size/1 function accepts only two arguments");
+                System.exit(0);
+            }
+
+            // Make sure that the give argument is a tuple
+            if(args.get(0).getKind() != RuntimeValueType.Tuple) {
+                System.err.println("Invalid Argument: t_size <tuple>");
+                System.exit(0);
+            }
+
+            RTupleValue tupleValue = (RTupleValue) args.get(0);
+            return new RNumberValue((double) tupleValue.contents.size());
+        }));
+
         return env;
     }
 

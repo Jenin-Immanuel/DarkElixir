@@ -209,7 +209,7 @@ public class Parser {
         while(this.not_eof() && this.at().type != TokenType.CloseSquare) {
             var value = this.parseMatchExpr();
             newList.contents.add(value);
-            if(this.at().type != TokenType.CloseBrace) {
+            if(this.at().type != TokenType.CloseSquare) {
                 this.expect(TokenType.Comma, "Expected TokenType Comma, But got " + this.at());
             }
         }

@@ -300,6 +300,14 @@ public class Interpreter {
         return newTuple;
     }
 
+    static RuntimeValue evaluateList(ListStructure list, Environment env) {
+        RListValue newList = new RListValue();
+        for(Expr content: list.contents) {
+            newList.contents.add(evaluate(content, env));
+        }
+        return newList;
+    }
+
     static RuntimeValue evaluateStringLiterals(StringLiteral string, Environment env) {
         RStringValue newString = new RStringValue(string.value);
         ArrayList<RuntimeValue> resulantValues = string.getInterpolatedValues().stream().map(arg -> evaluate(arg, env)).collect(Collectors.toCollection(ArrayList::new));
@@ -391,6 +399,9 @@ public class Interpreter {
                 }
                 case Tuple -> {
                     return evaluateTuple((Tuple) astNode, env);
+                }
+                case List -> {
+                    return evaluateList((ListStructure) astNode, env);
                 }
                 case FunctionDeclaration -> {
                     return evaluateFunctionValue((FunctionDeclaration) astNode, env);

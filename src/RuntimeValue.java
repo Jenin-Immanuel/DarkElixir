@@ -7,6 +7,7 @@ enum RuntimeValueType {
     Boolean,
     Atom,
     Tuple,
+    List,
     NativeFunction,
     IfStatement,
     IfNode,
@@ -171,7 +172,44 @@ class RTupleValue extends RuntimeValue {
         StringBuilder val = new StringBuilder("{ ");
         for(var content: contents) {
             val.append(content.toRawString());
+            val.append(" ");
         }
+        val.append("}");
+        return val.toString();
+    }
+}
+
+class RListValue extends RuntimeValue {
+    public ArrayList<RuntimeValue> contents;
+
+    public RListValue() {
+        this.contents = new ArrayList<>();
+    }
+
+    public RListValue(ArrayList<RuntimeValue> contents) {
+        this.contents = contents;
+    }
+
+    @Override
+    public String toString() {
+        return "RListValue{" +
+                "contents=" + contents +
+                '}';
+    }
+
+    @Override
+    public RuntimeValueType getKind() {
+        return RuntimeValueType.List;
+    }
+
+    @Override
+    public String toRawString() {
+        StringBuilder val = new StringBuilder("[ ");
+        for(var content: contents) {
+            val.append(content.toRawString());
+            val.append(" ");
+        }
+        val.append("]");
         return val.toString();
     }
 }
