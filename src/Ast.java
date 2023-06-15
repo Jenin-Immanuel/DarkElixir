@@ -11,7 +11,8 @@ enum AstNode {
     Atom,
     Tuple,
     IfStatement,
-    FunctionDeclaration
+    FunctionDeclaration,
+    ReturnStatement
 }
 
 abstract class Stmt {
@@ -296,6 +297,21 @@ class IfNode extends Stmt {
     @Override
     public AstNode getKind() {
         return AstNode.IfStatement;
+    }
+}
+
+class ReturnStatement extends Stmt {
+    public Expr returnValue;
+
+    public ReturnStatement(Expr returnValue) {
+        this.returnValue = returnValue;
+    }
+
+    public ReturnStatement() {}
+
+    @Override
+    public AstNode getKind() {
+        return AstNode.ReturnStatement;
     }
 }
 

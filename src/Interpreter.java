@@ -1,11 +1,13 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Stack;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 
 public class Interpreter {
+    static Stack<RuntimeValue> CallStack = new Stack<>();
 
     static Boolean equivalentBoolean(RuntimeValue val) {
         switch (val.getKind()) {
@@ -249,11 +251,18 @@ public class Interpreter {
         return new RNullValue();
     }
 
+    static RuntimeValue evaluateReturnStatement(ReturnStatement rs, Environment env) {
+        return evaluate(rs.returnValue, env);
+    }
+
     static  RuntimeValue evaluateCallExpr(CallExpr expr, Environment env) {
         var args = expr.args.stream().map(arg -> evaluate(arg, env)).toList();
         var fn = evaluate(expr.caller, env);
+        CallStack.push(fn);
         if(fn.getKind() == RuntimeValueType.NativeFunction) {
-            return ((RNativeFunction) fn).call.call(new ArrayList<>(args), env);
+            var returnValue =  ((RNativeFunction) fn).call.call(new ArrayList<>(args), env);
+            CallStack.pop();
+            return returnValue;
         }
         if(fn.getKind() == RuntimeValueType.FunctionValue) {
             var fnValue = (RFunctionValue) fn;
@@ -268,9 +277,15 @@ public class Interpreter {
             }
             RuntimeValue result = new RNullValue();
             for(var stmt: fnValue.body) {
+                if(stmt.getKind() == AstNode.ReturnStatement) {
+                    var returnValue = evaluateReturnStatement((ReturnStatement) stmt, scope);
+                    CallStack.pop();
+                    return returnValue;
+                }
                 result = evaluate(stmt, scope);
             }
-            return result;
+            CallStack.pop();
+            return new RNullValue();
         }
         System.err.println("Cannot call a value which is not a native function " + fn);
         System.exit(0);
@@ -379,6 +394,13 @@ public class Interpreter {
                 }
                 case FunctionDeclaration -> {
                     return evaluateFunctionValue((FunctionDeclaration) astNode, env);
+                }
+                case ReturnStatement -> {
+                    if(CallStack.empty()) {
+                        System.err.println("Top level return statements are not allowed.");
+                        System.exit(0);
+                    }
+                    return evaluateReturnStatement((ReturnStatement) astNode, env);
                 }
                 default -> {
                     System.err.println("This AST Node has not yet been setup for interpretation. " + astNode);

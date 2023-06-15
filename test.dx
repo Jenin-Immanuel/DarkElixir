@@ -1,5 +1,9 @@
 def fun(x, y) do
-    print(x + y)
+    if (y == 2) do
+        print("Here")
+    end
+    return x + y
 end
 
-fun(1, 2)
+x = fun(1, 2)
+print(x)

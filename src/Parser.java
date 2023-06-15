@@ -54,11 +54,19 @@ public class Parser {
             case Keyword_Def -> {
                 return this.parseFunctionDeclaration();
             }
+            case Keyword_Return -> {
+                return this.parseReturnStatement();
+            }
             default -> {
                 return this.parseExpr();
             }
         }
 
+    }
+
+    private Stmt parseReturnStatement() {
+        this.expect(TokenType.Keyword_Return, "Expected keyword RETURN for return statement. Given " +  this.at());
+        return new ReturnStatement(this.parseExpr());
     }
 
     private Stmt parseFunctionDeclaration() {

@@ -278,3 +278,4 @@ class RIfStatement extends RuntimeValue {
         return null;
     }
 }
+
