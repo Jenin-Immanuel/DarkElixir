@@ -1,3 +1,3 @@
-x = {8, 2}
-y = Tuple.at(x, 0)
+x = {2, 4}
+y = Tuple.to_list(x)
 print(y)
