@@ -13,7 +13,8 @@ enum RuntimeValueType {
     Module,
     IfStatement,
     IfNode,
-    FunctionValue
+    FunctionValue,
+    While
 }
 
 public abstract class RuntimeValue {
@@ -344,6 +345,33 @@ class RIfStatement extends RuntimeValue {
     @Override
     public RuntimeValueType getKind() {
         return RuntimeValueType.IfStatement;
+    }
+
+    @Override
+    public String toRawString() {
+        return null;
+    }
+}
+
+class RWhile extends RuntimeValue {
+    public Expr condition;
+    public ArrayList<Stmt> body;
+
+    public RWhile(Expr condition, ArrayList<Stmt> body) {
+        this.condition = condition;
+        this.body = body;
+    }
+
+    public RWhile(Expr condition) {
+        this.condition = condition;
+        this.body = new ArrayList<>();
+    }
+
+    public RWhile() {}
+
+    @Override
+    public RuntimeValueType getKind() {
+        return RuntimeValueType.While;
     }
 
     @Override

@@ -384,6 +384,22 @@ public class Interpreter {
         return new RBooleanValue(true);
     }
 
+    static RuntimeValue evaluateWhileStatement(WhileStatement whileStatement, Environment env) {
+        if(evaluate(whileStatement.condition, env).getKind() != RuntimeValueType.Boolean) {
+            System.err.println("Condition in while should be a boolean");
+            System.exit(0);
+        }
+        var condition = ((RBooleanValue) evaluate(whileStatement.condition, env)).value;
+
+        while(condition) {
+            for(var stmt: whileStatement.body) {
+                evaluate(stmt, env);
+            }
+            condition = ((RBooleanValue) evaluate(whileStatement.condition, env)).value;
+        }
+        return new RNullValue();
+    }
+
     static RuntimeValue evaluateFunctionValue(FunctionDeclaration fd, Environment env) {
         var fnValue = new RFunctionValue(fd.functionName, fd.parameters, fd.body, env);
         return env.declareVariable(fd.functionName, fnValue, false);
@@ -400,6 +416,9 @@ public class Interpreter {
                 }
                 case IfStatement -> {
                     return evaluateIfStatement((IfStatement) astNode, env);
+                }
+                case While -> {
+                    return evaluateWhileStatement((WhileStatement) astNode, env);
                 }
                 case Program -> {
                     return evaluateProgram((Program) astNode, env);
