@@ -21,6 +21,7 @@ enum TokenType {
     GreaterThanOrEqual,
     NotEqual,
     Not,
+    Dot,
     Keyword_If,
     Keyword_Elif,
     Keyword_Else,

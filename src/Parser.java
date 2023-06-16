@@ -275,7 +275,7 @@ public class Parser {
     }
 
     private Expr parseCallMemberExpr() {
-        var caller = this.parseUnaryExpr();
+        var caller = this.parseMemberExpr();
 
         if(this.at().type == TokenType.OpenParen) {
             return this.parseCallExpr(caller);
@@ -288,6 +288,39 @@ public class Parser {
             callExpr = (CallExpr) this.parseCallExpr(callExpr);
         }
         return callExpr;
+    }
+
+    private Expr parseMemberExpr() {
+        var object = this.parseUnaryExpr();
+        while(this.at().type == TokenType.Dot || this.at().type == TokenType.OpenSquare) {
+            var op = this.eat();
+            Expr property = new Expr() {
+                @Override
+                public AstNode getKind() {
+                    return null;
+                }
+            };
+            boolean computed = false;
+            if(op.type == TokenType.Dot) {
+                computed = false;
+                property = this.parseUnaryExpr();
+                if (property.getKind() != AstNode.Identifier) {
+                    System.err.println("Cannot use dot operator without right hand side being a identifier");
+                    System.exit(0);
+                }
+            }
+            else if(op.type == TokenType.OpenSquare) {
+                computed = true;
+                property = this.parseExpr();
+                this.expect(
+                        TokenType.CloseSquare,
+                        "Missing closing bracket in computed value."
+                );
+            }
+            object = new MemberExpr(object, property, computed);
+        }
+
+        return object;
     }
 
     private Expr parseUnaryExpr() {

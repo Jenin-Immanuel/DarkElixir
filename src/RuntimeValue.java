@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 enum RuntimeValueType {
     Null,
@@ -9,6 +10,7 @@ enum RuntimeValueType {
     Tuple,
     List,
     NativeFunction,
+    Module,
     IfStatement,
     IfNode,
     FunctionValue
@@ -242,6 +244,39 @@ class RNativeFunction extends RuntimeValue {
 
     static RNativeFunction MAKE_NATIVE_FN(FunctionCall call) {
         return new RNativeFunction(call);
+    }
+}
+
+class RModule extends RuntimeValue {
+    public String moduleName;
+    public HashMap<String, RNativeFunction> functions;
+
+    public RModule() {}
+
+    public RModule(String moduleName) {
+        this.moduleName = moduleName;
+        this.functions = new HashMap<>();
+    }
+
+    @Override
+    public String toString() {
+        return "RModule{" +
+                "moduleName='" + moduleName + '\'' +
+                ", functions=" + functions +
+                '}';
+    }
+
+    @Override
+    public RuntimeValueType getKind() {
+        return RuntimeValueType.Module;
+    }
+
+    @Override
+    public String toRawString() {
+        return "RModule{" +
+                "moduleName='" + moduleName + '\'' +
+                ", functions=" + functions +
+                '}';
     }
 }
 

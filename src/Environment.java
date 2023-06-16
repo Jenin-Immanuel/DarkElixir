@@ -53,15 +53,57 @@ public class Environment {
             return new RNullValue();
         }), true);
 
-        // Tuple functions
 
-        /*
-          Arguments
-          Tuple name / tuple itself
-         */
+        // Modules baby
+        Modules.declareAllModules(env);
+
+
+        // is a function
+        env.declareVariable("is_boolean", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
+            if(args.size() != 1) {
+                System.err.println("Invalid Arguments: is_boolean/1 function accepts only one argument");
+                System.exit(0);
+            }
+            return new RBooleanValue(args.get(0).getKind() == RuntimeValueType.Boolean);
+        }));
+
+        env.declareVariable("is_atom", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
+            if(args.size() != 1) {
+                System.err.println("Invalid Arguments: is_atom/1 function accepts only one argument");
+                System.exit(0);
+            }
+            return new RBooleanValue(args.get(0).getKind() == RuntimeValueType.Atom);
+        }));
+
+        env.declareVariable("is_number", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
+            if(args.size() != 1) {
+                System.err.println("Invalid Arguments: is_number/1 function accepts only one argument");
+                System.exit(0);
+            }
+            return new RBooleanValue(args.get(0).getKind() == RuntimeValueType.Number);
+        }));
+
+        env.declareVariable("is_tuple", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
+            if(args.size() != 1) {
+                System.err.println("Invalid Arguments: is_tuple/1 function accepts only one argument");
+                System.exit(0);
+            }
+            return new RBooleanValue(args.get(0).getKind() == RuntimeValueType.Tuple);
+        }));
+
+        env.declareVariable("is_list", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
+            if(args.size() != 1) {
+                System.err.println("Invalid Arguments: is_list/1 function accepts only one argument");
+                System.exit(0);
+            }
+            return new RBooleanValue(args.get(0).getKind() == RuntimeValueType.List);
+        }));
+
+
+        // len function
         env.declareVariable("len", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
             if(args.size() != 1) {
-                System.err.println("Invalid Arguments: len/1 function accepts only two arguments");
+                System.err.println("Invalid Arguments: len/1 function accepts only one argument");
                 System.exit(0);
             }
             RuntimeValue arg = args.get(0);

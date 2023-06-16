@@ -292,6 +292,33 @@ public class Interpreter {
         return new RNullValue();
     }
 
+    static RuntimeValue evaluateMemberExpr(MemberExpr memberExpr, Environment env) {
+
+        var mod = evaluate(memberExpr.object, env);
+        if(mod.getKind() != RuntimeValueType.Module) {
+            throw new RuntimeException("Error: LHS of a member expression should be a module");
+        }
+        if(memberExpr.property.getKind() != AstNode.Identifier)  {
+            throw new RuntimeException("Error: RHS of a member expression should be a function call of the module");
+        }
+        var lhs = (RModule) mod;
+        var rhs = (Identifier) memberExpr.property;
+
+        // Caller should be an identifier
+//        if(rhs.caller.getKind() != AstNode.Identifier)  {
+//            throw new RuntimeException("Error: The caller should be an Identifier");
+//        }
+        var caller = rhs.symbol;
+
+        // Check if it is present
+        if(lhs.functions.get(caller) != null) {
+            return lhs.functions.get(caller);
+        } else {
+            throw new RuntimeException("InvalidIndexGiven: at function Tuple.at/2");
+        }
+
+    }
+
     static RuntimeValue evaluateTuple(Tuple tuple, Environment env) {
         RTupleValue newTuple = new RTupleValue();
         for(Expr content: tuple.contents) {
@@ -385,6 +412,9 @@ public class Interpreter {
                 }
                 case CallExpr -> {
                     return evaluateCallExpr((CallExpr) astNode, env);
+                }
+                case MemberExpr -> {
+                    return evaluateMemberExpr((MemberExpr) astNode, env);
                 }
                 case Atom -> {
                     String atomValue = ((Atom) astNode).value;

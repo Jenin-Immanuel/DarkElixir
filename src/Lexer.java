@@ -96,6 +96,9 @@ public class Lexer {
             else if(src.charAt(i) == ',') {
                 tokens.add(new Token(",", TokenType.Comma));
             }
+            else if(src.charAt(i) == '.') {
+                tokens.add(new Token(".", TokenType.Dot));
+            }
             // Check for -ve numbers before checking for binary operators
             else if(src.charAt(i) == '+' || src.charAt(i) == '-' || src.charAt(i) == '*' || src.charAt(i) == '/' || src.charAt(i) == '%') {
                 if (src.charAt(i) == '-' && (tokens.isEmpty() || tokens.get(tokens.size() - 1).type != TokenType.Number)) {
