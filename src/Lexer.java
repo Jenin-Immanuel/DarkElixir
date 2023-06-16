@@ -30,6 +30,7 @@ public class Lexer {
         KEYWORDS.put("not", TokenType.Keyword_Not);
         KEYWORDS.put("def", TokenType.Keyword_Def);
         KEYWORDS.put("return", TokenType.Keyword_Return);
+        KEYWORDS.put("while", TokenType.Keyword_While);
     }
 
     private boolean borderCheck() {

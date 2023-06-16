@@ -57,11 +57,26 @@ public class Parser {
             case Keyword_Return -> {
                 return this.parseReturnStatement();
             }
+            case Keyword_While -> {
+                return this.parseWhileStatement();
+            }
             default -> {
                 return this.parseExpr();
             }
         }
 
+    }
+
+    private Stmt parseWhileStatement() {
+        WhileStatement whileStatement = new WhileStatement();
+        this.expect(TokenType.Keyword_While, "Expected keyword WHILE for while statement. Given " + this.at());
+        whileStatement.condition = this.parseExpr();
+        this.expect(TokenType.Keyword_Do, "Expected keyword DO. Given " + this.at());
+        while(this.at().type != TokenType.Keyword_End && this.at().type != TokenType.EOF) {
+            whileStatement.body.add(this.parseStmt());
+        }
+        this.expect(TokenType.Keyword_End,  "Expected keyword END at the end of while. Given " + this.at());
+        return whileStatement;
     }
 
     private Stmt parseReturnStatement() {

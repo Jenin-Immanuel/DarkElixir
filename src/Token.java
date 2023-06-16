@@ -32,6 +32,7 @@ enum TokenType {
     Keyword_Not,
     Keyword_Def,
     Keyword_Return,
+    Keyword_While,
     EOF
 }
 

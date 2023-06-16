@@ -13,6 +13,7 @@ enum AstNode {
     Tuple,
     List,
     IfStatement,
+    While,
     FunctionDeclaration,
     ReturnStatement
 }
@@ -398,5 +399,32 @@ class FunctionDeclaration extends Stmt {
     @Override
     public AstNode getKind() {
         return AstNode.FunctionDeclaration;
+    }
+}
+
+class WhileStatement extends Stmt {
+    public Expr condition;
+    public ArrayList<Stmt> body;
+
+    public WhileStatement(Expr condition, ArrayList<Stmt> body) {
+        this.condition = condition;
+        this.body = body;
+    }
+
+    public WhileStatement() {
+        this.body = new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        return "WhileStatement{" +
+                "condition=" + condition +
+                ", body=" + body +
+                '}';
+    }
+
+    @Override
+    public AstNode getKind() {
+        return AstNode.While;
     }
 }
