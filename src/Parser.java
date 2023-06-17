@@ -279,7 +279,7 @@ public class Parser {
         var left = this.parseCallMemberExpr();
         while(this.at().value.equals("*") || this.at().value.equals("/") || this.at().value.equals("%")) {
             var op = this.eat().value;
-            var right = this.parsePrimaryExpr();
+            var right = this.parseCallMemberExpr();
             var binExp = new BinaryExpr();
             binExp.left = left;
             binExp.right = right;
@@ -413,3 +413,5 @@ public class Parser {
         return new BinaryExpr();
     }
 }
+
+

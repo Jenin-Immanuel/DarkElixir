@@ -1,8 +1,17 @@
+import java.util.Objects;
+
 public class Modules {
 
     static void expect(RuntimeValueType given, RuntimeValueType expected, String msg) {
         if(given != expected) {
             System.err.println(msg);
+            System.exit(0);
+        }
+    }
+
+    static void expectArgs(String functionName, Integer givenArgs, Integer requiredArgs, String argFormat) {
+        if(!Objects.equals(givenArgs, requiredArgs)) {
+            System.err.println("InvalidArguments: Argument format of " + functionName + " " + argFormat);
             System.exit(0);
         }
     }

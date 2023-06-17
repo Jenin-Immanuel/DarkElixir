@@ -1,5 +1,8 @@
-i = 5
-while i <= 10 do
-    print(i)
-    i = i + 1
+def factorial(n) do
+    if (n == 1) do
+        return 1
+    end
+    return n * factorial(n - 1)
 end
+
+print(factorial(5))

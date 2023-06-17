@@ -9,6 +9,10 @@ import java.util.stream.Collectors;
 public class Interpreter {
     static Stack<RuntimeValue> CallStack = new Stack<>();
 
+    static Stack<RuntimeValue> returnStack = new Stack<>();
+
+    static Boolean isReturnIssued = false;
+
     static Boolean equivalentBoolean(RuntimeValue val) {
         switch (val.getKind()) {
             case Boolean -> {
@@ -252,19 +256,23 @@ public class Interpreter {
     }
 
     static RuntimeValue evaluateReturnStatement(ReturnStatement rs, Environment env) {
-        return evaluate(rs.returnValue, env);
+        var res = evaluate(rs.returnValue, env);
+        if(CallStack.empty()) {
+            System.err.println("InvalidReturn: Top level Return Statements are not allowed");
+        }
+        returnStack.push(res);
+        isReturnIssued = true;
+        return res;
     }
 
     static  RuntimeValue evaluateCallExpr(CallExpr expr, Environment env) {
         var args = expr.args.stream().map(arg -> evaluate(arg, env)).toList();
         var fn = evaluate(expr.caller, env);
-        CallStack.push(fn);
         if(fn.getKind() == RuntimeValueType.NativeFunction) {
-            var returnValue =  ((RNativeFunction) fn).call.call(new ArrayList<>(args), env);
-            CallStack.pop();
-            return returnValue;
+            return ((RNativeFunction) fn).call.call(new ArrayList<>(args), env);
         }
         if(fn.getKind() == RuntimeValueType.FunctionValue) {
+            CallStack.push(fn);
             var fnValue = (RFunctionValue) fn;
 
             // Declare a new scope with current env as the parent
@@ -277,12 +285,13 @@ public class Interpreter {
             }
             RuntimeValue result = new RNullValue();
             for(var stmt: fnValue.body) {
-                if(stmt.getKind() == AstNode.ReturnStatement) {
-                    var returnValue = evaluateReturnStatement((ReturnStatement) stmt, scope);
-                    CallStack.pop();
-                    return returnValue;
-                }
                 result = evaluate(stmt, scope);
+
+                // If the executed statement is return
+                if(isReturnIssued && !returnStack.empty()) {
+                    CallStack.pop();
+                    return returnStack.pop();
+                }
             }
             CallStack.pop();
             return new RNullValue();
@@ -355,6 +364,7 @@ public class Interpreter {
         var scope = new Environment(env);
         for(var stmt: body){
             lastEvaluated = evaluate(stmt, scope);
+            if(isReturnIssued) break;
         }
     }
 
@@ -417,6 +427,9 @@ public class Interpreter {
                 case IfStatement -> {
                     return evaluateIfStatement((IfStatement) astNode, env);
                 }
+                case ReturnStatement -> {
+                    return evaluateReturnStatement((ReturnStatement) astNode, env);
+                }
                 case While -> {
                     return evaluateWhileStatement((WhileStatement) astNode, env);
                 }
@@ -454,13 +467,6 @@ public class Interpreter {
                 }
                 case FunctionDeclaration -> {
                     return evaluateFunctionValue((FunctionDeclaration) astNode, env);
-                }
-                case ReturnStatement -> {
-                    if(CallStack.empty()) {
-                        System.err.println("Top level return statements are not allowed.");
-                        System.exit(0);
-                    }
-                    return evaluateReturnStatement((ReturnStatement) astNode, env);
                 }
                 default -> {
                     System.err.println("This AST Node has not yet been setup for interpretation. " + astNode);
