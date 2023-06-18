@@ -1,1 +1,2 @@
 x = fn a -> a + 1 end
+print(x(1))

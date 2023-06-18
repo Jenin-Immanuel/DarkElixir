@@ -14,6 +14,7 @@ enum RuntimeValueType {
     IfStatement,
     IfNode,
     FunctionValue,
+    AnonymousFn,
     While
 }
 
@@ -304,6 +305,33 @@ class RFunctionValue extends RuntimeValue {
     @Override
     public String toRawString() {
         return null;
+    }
+}
+
+class RAnonymousFn extends RuntimeValue {
+    public ArrayList<Expr> parameters;
+    public Expr returnExpr;
+
+    public Environment declarationEnv;
+
+    public RAnonymousFn(ArrayList<Expr> parameters, Expr returnExpr, Environment declarationEnv) {
+        this.parameters = parameters;
+        this.returnExpr = returnExpr;
+        this.declarationEnv = declarationEnv;
+    }
+
+    public RAnonymousFn() {
+        this.parameters = new ArrayList<>();
+    }
+
+    @Override
+    public RuntimeValueType getKind() {
+        return RuntimeValueType.AnonymousFn;
+    }
+
+    @Override
+    public String toRawString() {
+        return "<anonymousfn-" + parameters.toString() + ">";
     }
 }
 

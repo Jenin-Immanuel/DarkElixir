@@ -296,6 +296,20 @@ public class Interpreter {
             CallStack.pop();
             return new RNullValue();
         }
+        if(fn.getKind() == RuntimeValueType.AnonymousFn) {
+            CallStack.push(fn);
+            var fnValue = (RAnonymousFn) fn;
+
+            var scope = new Environment(fnValue.declarationEnv);
+            for(int i = 0; i < fnValue.parameters.size(); i++) {
+//                System.out.println(fnValue.parameters.get(i).toString() + " " + args.get(i));
+                scope.declareVariable(((Identifier)fnValue.parameters.get(i)).symbol, args.get(i), false);
+            }
+
+            var res =  evaluate(fnValue.returnExpr, scope);
+            CallStack.pop();
+            return res;
+        }
         System.err.println("Cannot call a value which is not a native function " + fn);
         System.exit(0);
         return new RNullValue();
@@ -415,6 +429,10 @@ public class Interpreter {
         return env.declareVariable(fd.functionName, fnValue, false);
     }
 
+    static RuntimeValue evaluateAnonymousFn(AnonymousFn fn, Environment env) {
+        return new RAnonymousFn(fn.parameters, fn.returnExpr, env);
+    }
+
     static RuntimeValue evaluate(Stmt astNode, Environment env) {
         if(astNode.getKind() != null) {
             switch (astNode.getKind()) {
@@ -467,6 +485,9 @@ public class Interpreter {
                 }
                 case FunctionDeclaration -> {
                     return evaluateFunctionValue((FunctionDeclaration) astNode, env);
+                }
+                case AnonymousFn -> {
+                    return evaluateAnonymousFn((AnonymousFn) astNode, env);
                 }
                 default -> {
                     System.err.println("This AST Node has not yet been setup for interpretation. " + astNode);

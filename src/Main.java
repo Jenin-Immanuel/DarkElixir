@@ -29,7 +29,6 @@ public class Main {
 
         Program program = parser.produceAst(sourceCode.toString());
 
-        System.out.println(program.body);
         var result = Interpreter.evaluateProgram(program, env);
     }
     static void repl() {
