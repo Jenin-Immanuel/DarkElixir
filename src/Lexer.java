@@ -31,6 +31,7 @@ public class Lexer {
         KEYWORDS.put("def", TokenType.Keyword_Def);
         KEYWORDS.put("return", TokenType.Keyword_Return);
         KEYWORDS.put("while", TokenType.Keyword_While);
+        KEYWORDS.put("fn", TokenType.Keyword_Fn);
     }
 
     private boolean borderCheck() {
@@ -103,7 +104,12 @@ public class Lexer {
             // Check for -ve numbers before checking for binary operators
             else if(src.charAt(i) == '+' || src.charAt(i) == '-' || src.charAt(i) == '*' || src.charAt(i) == '/' || src.charAt(i) == '%') {
                 if (src.charAt(i) == '-' && (tokens.isEmpty() || tokens.get(tokens.size() - 1).type != TokenType.Number)) {
-                    tokens.add(new Token("-", TokenType.Minus));
+                    if(src.charAt(i + 1) == '>') {
+                        i++;
+                        tokens.add(new Token("->", TokenType.ArrowOperator));
+                    } else {
+                        tokens.add(new Token("-", TokenType.Minus));
+                    }
                 } else {
                     tokens.add(new Token(Character.toString(src.charAt(i)), TokenType.BinaryOperator));
                 }

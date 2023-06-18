@@ -5,6 +5,7 @@ enum TokenType {
     Let,
     Minus,
     BinaryOperator,
+    ArrowOperator,
     Match,
     OpenParen,
     CloseParen,
@@ -33,6 +34,7 @@ enum TokenType {
     Keyword_Def,
     Keyword_Return,
     Keyword_While,
+    Keyword_Fn,
     EOF
 }
 

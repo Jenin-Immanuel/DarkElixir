@@ -159,7 +159,20 @@ public class Parser {
         return condition;
     }
     private Expr parseExpr() {
+        if(this.at().type == TokenType.Keyword_Fn) {
+            return this.parseAnonymousFn();
+        }
         return this.parseMatchExpr();
+    }
+
+    private Expr parseAnonymousFn() {
+        AnonymousFn anonymousFn = new AnonymousFn();
+        this.expect(TokenType.Keyword_Fn, "Expected keyword fn for Anonymous function declaration");
+        anonymousFn.parameters = this.at().type == TokenType.ArrowOperator ? new ArrayList<Expr>() : parseArgumentsList();
+        this.expect(TokenType.ArrowOperator, "Expected ->: Given " + this.at().type);
+        anonymousFn.returnExpr = parseExpr();
+        this.expect(TokenType.Keyword_End, "Expected keyword end after Anonymous function declaration");
+        return anonymousFn;
     }
 
     private Expr parseMatchExpr() {
@@ -168,7 +181,7 @@ public class Parser {
         if(this.at().type == TokenType.Match) {
             // Go through the match operator
             this.eat();
-            var right = this.parseMatchExpr(); // Result
+            var right = this.parseExpr(); // Result
             return new MatchExpr(left, right);
         }
         return left;

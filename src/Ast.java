@@ -15,6 +15,7 @@ enum AstNode {
     IfStatement,
     While,
     FunctionDeclaration,
+    AnonymousFn,
     ReturnStatement
 }
 
@@ -362,6 +363,35 @@ class ReturnStatement extends Stmt {
     @Override
     public AstNode getKind() {
         return AstNode.ReturnStatement;
+    }
+}
+
+class AnonymousFn extends Expr {
+
+    public ArrayList<Expr> parameters;
+
+    public Expr returnExpr;
+
+    public AnonymousFn(ArrayList<Expr> parameters, Expr returnExpr) {
+        this.parameters = parameters;
+        this.returnExpr = returnExpr;
+    }
+
+    public AnonymousFn() {
+        this.parameters = new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        return "AnonymousFn{" +
+                "parameters=" + parameters +
+                ", returnExpr=" + returnExpr +
+                '}';
+    }
+
+    @Override
+    public AstNode getKind() {
+        return AstNode.AnonymousFn;
     }
 }
 

@@ -1,8 +1,1 @@
-def factorial(n) do
-    if (n == 1) do
-        return 1
-    end
-    return n * factorial(n - 1)
-end
-
-print(factorial(5))
+x = fn a -> a + 1 end

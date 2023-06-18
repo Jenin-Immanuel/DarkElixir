@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
 public class Modules {
@@ -14,6 +17,57 @@ public class Modules {
             System.err.println("InvalidArguments: Argument format of " + functionName + " " + argFormat);
             System.exit(0);
         }
+    }
+
+    static void expectEnumerable(RuntimeValue given, String argFormat) {
+        if(given.getKind() != RuntimeValueType.List) {
+            System.err.println(argFormat);
+            System.exit(0);
+        }
+    }
+
+
+    static void declareEnumModule(Environment scope) {
+        RModule module = new RModule("Enum");
+
+        // map/2
+        module.functions.put("map", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argFormat = "InvalidArguments: Argument Format of Enum.map/2 (enumerable, fn)";
+            if(args.size() != 2) {
+                System.err.println(module.moduleName + " at function accepts only two argument");
+                System.exit(0);
+            }
+            var firstArg = args.get(0);
+
+            expectEnumerable(firstArg, argFormat);
+
+
+            expect(args.get(1).getKind(), RuntimeValueType.NativeFunction, argFormat);
+
+            var secondArg = (RNativeFunction) args.get(1);
+            switch (firstArg.getKind()) {
+                case List -> {
+                    var list = (RListValue) firstArg;
+                    RListValue res = new RListValue();
+                    for(var e: list.contents) {
+                        var give = new ArrayList<RuntimeValue>();
+                        give.add(e);
+
+                        res.contents.add(secondArg.call.call(give, scope));
+                    }
+                    return res;
+                }
+            }
+
+
+
+            return new RNullValue();
+        })));
+
+        // sort/1
+        // sort/2
+
+
     }
     static void declareTupleModule(Environment scope) {
         RModule module = new RModule("Tuple");
