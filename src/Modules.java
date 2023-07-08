@@ -20,7 +20,7 @@ public class Modules {
     }
 
     static void expectEnumerable(RuntimeValue given, String argFormat) {
-        if(given.getKind() != RuntimeValueType.List) {
+        if(given.getKind() != RuntimeValueType.List && given.getKind() != RuntimeValueType.Map) {
             System.err.println(argFormat);
             System.exit(0);
         }
@@ -48,6 +48,11 @@ public class Modules {
             switch (firstArg.getKind()) {
                 case List -> {
                     var fnValue = (RAnonymousFn) args.get(1);
+                    // args should be only 1
+                    if(fnValue.parameters.size() != 1) {
+                        System.err.println("The map function should have only one arg for list");
+                        System.exit(0);
+                    }
                     var innerScope = new Environment(fnValue.declarationEnv);
 
                     var list = (RListValue) firstArg;
@@ -58,10 +63,45 @@ public class Modules {
                     }
                     return res;
                 }
+                case Map -> {
+                    var fnValue = (RAnonymousFn) args.get(1);
+                    // args should be only 1
+                    if(fnValue.parameters.size() != 2) {
+                        System.err.println("The map function should have two args for maps");
+                        System.exit(0);
+                    }
+                    var innerScope = new Environment(fnValue.declarationEnv);
+
+                    var map = (RMapStructure) firstArg;
+                    RMapStructure res = new RMapStructure();
+
+                }
             }
 
 
             return new RNullValue();
+        })));
+
+        // sum
+
+        module.functions.put("sum", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            expectArgs("sum", args.size(), 1, "sum (list)");
+
+            expect(args.get(0).getKind(), RuntimeValueType.List, module.moduleName + " at function accepts only two argument");
+            var list = (RListValue) args.get(0);
+
+            Double sum = (double) 0;
+            for(var e: list.contents) {
+                if(e.getKind() !=  RuntimeValueType.Number) {
+                    System.err.println("The array in Enum.sum should contain only numbers");
+                    System.exit(0);
+                }
+
+                RNumberValue n = (RNumberValue) e;
+                sum += n.number;
+            }
+
+            return new RNumberValue(sum);
         })));
 
         // sort/1

@@ -1,5 +1,5 @@
 x = fn x -> x + 1 end
 print(x(1))
 y = [1, 2, 3]
-z = Enum.map(y, x)
+z = Enum.sum(y)
 print(z)
