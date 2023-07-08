@@ -1,2 +1,5 @@
-x = %{a => 86, 77 => 9}
-print(x)
+x = fn x -> x + 1 end
+print(x(1))
+y = [1, 2, 3]
+z = Enum.map(y, x)
+print(z)

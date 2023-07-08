@@ -42,23 +42,23 @@ public class Modules {
             expectEnumerable(firstArg, argFormat);
 
 
-            expect(args.get(1).getKind(), RuntimeValueType.NativeFunction, argFormat);
+            expect(args.get(1).getKind(), RuntimeValueType.AnonymousFn, argFormat);
 
-            var secondArg = (RNativeFunction) args.get(1);
+//            var secondArg = (RAnonymousFn) args.get(1);
             switch (firstArg.getKind()) {
                 case List -> {
+                    var fnValue = (RAnonymousFn) args.get(1);
+                    var innerScope = new Environment(fnValue.declarationEnv);
+
                     var list = (RListValue) firstArg;
                     RListValue res = new RListValue();
                     for(var e: list.contents) {
-                        var give = new ArrayList<RuntimeValue>();
-                        give.add(e);
-
-                        res.contents.add(secondArg.call.call(give, scope));
+                        innerScope.declareVariable(((Identifier)fnValue.parameters.get(0)).symbol, e, false);
+                        res.contents.add(Interpreter.evaluate(fnValue.returnExpr, innerScope));
                     }
                     return res;
                 }
             }
-
 
 
             return new RNullValue();
@@ -67,7 +67,7 @@ public class Modules {
         // sort/1
         // sort/2
 
-
+        scope.declareVariable("Enum", module, true);
     }
     static void declareTupleModule(Environment scope) {
         RModule module = new RModule("Tuple");
@@ -166,8 +166,8 @@ public class Modules {
 
         scope.declareVariable("Tuple", module, true);
     }
-
      static void declareAllModules(Environment env) {
         declareTupleModule(env);
+        declareEnumModule(env);
     }
 }
