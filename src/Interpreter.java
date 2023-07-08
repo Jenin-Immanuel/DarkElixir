@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Stack;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -358,6 +355,22 @@ public class Interpreter {
         return newList;
     }
 
+    static RuntimeValue evaluateMap(MapStructure map, Environment env) {
+        RMapStructure newMap = new RMapStructure();
+        for (Map.Entry<Expr,Expr> mapElement : map.map.entrySet()) {
+            RuntimeValue key;
+
+            if(mapElement.getKey().getKind() == AstNode.Identifier) {
+                key = evaluate(Utils.identifierToAtom((Identifier) mapElement.getKey()), env);
+            } else {
+                key = evaluate(mapElement.getKey(), env);
+            }
+            var value = evaluate(mapElement.getValue(), env);
+            newMap.map.put(key, value);
+        }
+        return newMap;
+    }
+
     static RuntimeValue evaluateStringLiterals(StringLiteral string, Environment env) {
         RStringValue newString = new RStringValue(string.value);
         ArrayList<RuntimeValue> resulantValues = string.getInterpolatedValues().stream().map(arg -> evaluate(arg, env)).collect(Collectors.toCollection(ArrayList::new));
@@ -482,6 +495,9 @@ public class Interpreter {
                 }
                 case List -> {
                     return evaluateList((ListStructure) astNode, env);
+                }
+                case Map -> {
+                    return evaluateMap((MapStructure) astNode, env);
                 }
                 case FunctionDeclaration -> {
                     return evaluateFunctionValue((FunctionDeclaration) astNode, env);

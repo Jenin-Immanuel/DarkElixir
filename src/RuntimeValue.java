@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 enum RuntimeValueType {
     Null,
@@ -9,6 +10,7 @@ enum RuntimeValueType {
     Atom,
     Tuple,
     List,
+    Map,
     NativeFunction,
     Module,
     IfStatement,
@@ -216,6 +218,50 @@ class RListValue extends RuntimeValue {
         val.append("]");
         return val.toString();
     }
+}
+
+class RMapStructure extends RuntimeValue {
+    public HashMap<RuntimeValue, RuntimeValue> map;
+
+    public RMapStructure(HashMap<RuntimeValue, RuntimeValue> map) {
+        this.map = map;
+    }
+
+    public RMapStructure() {
+        this.map = new HashMap<>();
+    }
+
+    @Override
+    public String toString() {
+        return "RMapStructure{" +
+                "map=" + map +
+                '}';
+    }
+
+    @Override
+    public RuntimeValueType getKind() {
+        return RuntimeValueType.Map;
+    }
+
+    @Override
+    public String toRawString() {
+        StringBuilder val = new StringBuilder("%{");
+        int a = 1;
+        for (Map.Entry<RuntimeValue, RuntimeValue> mapElement : map.entrySet()) {
+            val.append(mapElement.getKey().toRawString());
+            val.append(" : ");
+            val.append(mapElement.getValue().toRawString());
+
+            if(a == map.size()) break;
+
+            val.append(", ");
+            a++;
+        }
+        val.append("}");
+        return val.toString();
+    }
+
+
 }
 
 @FunctionalInterface
