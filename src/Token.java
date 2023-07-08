@@ -19,6 +19,7 @@ enum TokenType {
     LessThan,
     GreaterThan,
     LessThanOrEqual,
+    MapOperator,
     GreaterThanOrEqual,
     NotEqual,
     Not,

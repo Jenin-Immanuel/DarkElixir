@@ -137,6 +137,11 @@ public class Lexer {
                     i += 2;
                     continue;
                 }
+                if(this.borderCheck() && src.charAt(i + 1) == '>') {
+                    tokens.add(new Token("=>", TokenType.MapOperator));
+                    i += 2;
+                    continue;
+                }
                 tokens.add(new Token("=", TokenType.Match));
             }
             else if(src.charAt(i) == '!') {

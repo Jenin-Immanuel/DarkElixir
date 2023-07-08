@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -195,11 +196,40 @@ public class Parser {
             case OpenSquare -> {
                 return this.parseListExpr();
             }
-            default -> {
-                return parseLogicalExpr();
+            case BinaryOperator -> {
+                if(Objects.equals(this.at().value, "%")) {
+                    return this.parseMapExpr();
+                }
             }
         }
+        return parseLogicalExpr();
     }
+
+    private Expr parseMapExpr() {
+
+        // b = %{ a => 76, 86 => "String" }
+
+        this.expect(TokenType.BinaryOperator, "Expected op: %. Given " + this.at());
+
+        // Expect open brace
+        this.expect(TokenType.OpenBrace, "Expected Open Brace { for Map Declaration");
+        var newMap = new MapStructure();
+        while(this.not_eof() && this.at().type != TokenType.CloseBrace) {
+
+            var key = this.parseMatchExpr();
+            this.expect(TokenType.MapOperator, "Expected Map Operator between keywords");
+            var value = this.parseMatchExpr();
+            newMap.map.put(key, value);
+            if(this.at().type != TokenType.CloseBrace) {
+                this.expect(TokenType.Comma, "Expected TokenType Comma, But got " + this.at());
+            }
+        }
+        // Eat the close brace
+        this.expect(TokenType.CloseBrace, "Expected trailing Closing Brackets. But got " + this.at());
+        return newMap;
+    }
+
+
     private Expr parseTupleExpr() {
         // Not a tuple
         if(this.at().type != TokenType.OpenBrace)

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 enum AstNode {
     Program,
@@ -12,6 +13,7 @@ enum AstNode {
     Atom,
     Tuple,
     List,
+    Map,
     IfStatement,
     While,
     FunctionDeclaration,
@@ -275,6 +277,26 @@ class Tuple extends Expr {
     @Override
     public AstNode getKind() {
         return AstNode.Tuple;
+    }
+}
+
+class MapStructure extends Expr {
+    public HashMap<Expr, Expr> map;
+
+    public MapStructure() {
+        this.map = new HashMap<>();
+    }
+
+    @Override
+    public String toString() {
+        return "MapStructure{" +
+                "map=" + map +
+                '}';
+    }
+
+    @Override
+    public AstNode getKind() {
+        return AstNode.Map;
     }
 }
 
