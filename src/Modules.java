@@ -135,7 +135,7 @@ public class Modules {
         module.functions.put("append", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
             String argError = "InvalidArguments: Argument Format of Tuple.append/2 (tuple, element)";
             if(args.size() != 2) {
-                System.err.println(module.moduleName + " at function accepts only two argument");
+                System.err.println(module.moduleName + " append function accepts only two argument");
                 System.exit(0);
             }
 
@@ -167,7 +167,7 @@ public class Modules {
         module.functions.put("insert_at", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
             String argError = "InvalidArguments: Argument Format of Tuple.insert_at/3 (tuple, index, value)";
             if(args.size() != 3) {
-                System.err.println(module.moduleName + " at function accepts only two argument");
+                System.err.println(module.moduleName + " insert_at function accepts only two argument");
                 System.exit(0);
             }
 
@@ -206,8 +206,108 @@ public class Modules {
 
         scope.declareVariable("Tuple", module, true);
     }
+
+    static void declareListModule(Environment scope) {
+        RModule module = new RModule("List");
+
+        module.functions.put("at", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argFormat = "InvalidArguments: Argument Format of List.at/2 (list, index)";
+            if(args.size() != 2) {
+                System.err.println(module.moduleName + " at function accepts only two argument");
+                System.exit(0);
+            }
+
+            expect(args.get(0).getKind(), RuntimeValueType.List, argFormat);
+            expect(args.get(1).getKind(), RuntimeValueType.Number, argFormat);
+
+
+            var firstArg = (RListValue) args.get(0);
+            var secondArg = (RNumberValue) args.get(1);
+
+
+            return firstArg.contents.get(secondArg.number.intValue());
+        })));
+
+        module.functions.put("append", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argError = "InvalidArguments: Argument Format of List.append/2 (list, element)";
+            if(args.size() != 2) {
+                System.err.println(module.moduleName + " append function accepts only two argument");
+                System.exit(0);
+            }
+
+            expect(args.get(0).getKind(), RuntimeValueType.List, argError);
+            var firstArg = (RListValue) args.get(0);
+            firstArg.contents.add(args.get(1));
+            return firstArg;
+        })));
+
+        module.functions.put("delete_at", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argError = "InvalidArguments: Argument Format of List.delete_at/2 (list, index)";
+            if(args.size() != 2) {
+                System.err.println(module.moduleName + " delete_at function accepts only two arguments");
+                System.exit(0);
+            }
+
+            expect(args.get(0).getKind(), RuntimeValueType.List, argError);
+            expect(args.get(1).getKind(), RuntimeValueType.Number, argError);
+
+
+            var firstArg = (RListValue) args.get(0);
+            var secondArg = (RNumberValue) args.get(1);
+            firstArg.contents.remove(secondArg.number.intValue());
+            return firstArg;
+        })));
+
+        module.functions.put("insert_at", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argError = "InvalidArguments: Argument Format of List.insert_at/3 (list, index, value)";
+            if(args.size() != 3) {
+                System.err.println(module.moduleName + " insert_at function accepts three arguments");
+                System.exit(0);
+            }
+
+            expect(args.get(0).getKind(), RuntimeValueType.List, argError);
+            expect(args.get(1).getKind(), RuntimeValueType.Number, argError);
+
+
+            var firstArg = (RListValue) args.get(0);
+            var secondArg = (RNumberValue) args.get(1);
+
+            if(secondArg.number >= firstArg.contents.size()) {
+                System.err.println("Invalid Argument:Size of the list is smaller than the given index. List.insert_at/3");
+            }
+            System.out.println(secondArg.number.intValue() + " " + firstArg.contents.size());
+            firstArg.contents.add(secondArg.number.intValue(), args.get(2));
+            return firstArg;
+        })));
+
+        module.functions.put("pop", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argError = "InvalidArguments: Argument Format of List.pop (list)";
+            if(args.size() != 1) {
+                System.err.println(module.moduleName + " pop function accepts only one argument");
+                System.exit(0);
+            }
+
+            expect(args.get(0).getKind(), RuntimeValueType.List, argError);
+
+            var firstArg = (RListValue) args.get(0);
+            if(firstArg.contents.size() == 0) {
+                System.err.println("List.pop: Index Error while pop");
+                System.exit(0);
+            }
+
+            RTupleValue returnValue = new RTupleValue();
+            returnValue.contents.add(firstArg.contents.get(firstArg.contents.size() - 1));
+            firstArg.contents.remove(firstArg.contents.size() - 1);
+            returnValue.contents.add(firstArg);
+
+            return returnValue;
+        })));
+
+        scope.declareVariable("List", module, true);
+    }
      static void declareAllModules(Environment env) {
         declareTupleModule(env);
         declareEnumModule(env);
+        declareListModule(env);
     }
 }
