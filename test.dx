@@ -1,4 +1,5 @@
-x = [1, 2, 3]
-{x, y} = List.pop(x)
+x = %{a => "Hello", b => "Sello"}
 print(x)
-print(y)
+print(:a)
+x = Map.delete(x, :a)
+print(x)

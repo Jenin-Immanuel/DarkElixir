@@ -26,7 +26,41 @@ public class Modules {
         }
     }
 
+    static void safeError(String msg) {
+        System.err.println(msg);
+        System.exit(0);
+    }
 
+
+    static void declareMapModule(Environment scope) {
+        RModule module = new RModule("Map");
+
+        // delete (map, key)
+        // Returns: A map with the particular key removed
+
+        module.functions.put("delete", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argFormat = "InvalidArguments: Argument Format of Map.delete/2 (map, key)";
+            expectArgs("Map.delete", args.size(), 2, "(map, key)");
+            expect(args.get(0).getKind(), RuntimeValueType.Map, argFormat);
+
+            // 2nd arg can be of any value
+
+            RMapStructure map = (RMapStructure) args.get(0);
+
+            if(!map.map.containsKey(args.get(1))) {
+                safeError("IndexError: Map.delete() Map does not contain the given key");
+            }
+            map.map.remove(args.get(1));
+
+
+            return map;
+        })));
+
+
+
+        scope.declareVariable("Map", module, true);
+
+    }
     static void declareEnumModule(Environment scope) {
         RModule module = new RModule("Enum");
 
@@ -309,5 +343,6 @@ public class Modules {
         declareTupleModule(env);
         declareEnumModule(env);
         declareListModule(env);
+        declareMapModule(env);
     }
 }

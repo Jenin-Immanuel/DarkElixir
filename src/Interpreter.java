@@ -175,13 +175,13 @@ public class Interpreter {
 
     static RuntimeValue evaluateMatchExpr(MatchExpr matchExpr, Environment env) {
 
-
         if(matchExpr.toAssigned.getKind() != AstNode.Identifier && matchExpr.toAssigned.getKind() != AstNode.Tuple) {
             System.err.println("Invalid LHS of the Match expression " + matchExpr.toAssigned);
             System.exit(0);
         }
 
         // Implement tuple destructuring
+
 
         switch (matchExpr.toAssigned.getKind()) {
             case Identifier -> {
@@ -207,7 +207,6 @@ public class Interpreter {
                 var rhsKind = evaluate(matchExpr.value, env);
 
                 if(rhsKind.getKind() != RuntimeValueType.Tuple) {
-                    System.out.println("Here");
                     System.err.println("Match error. No match for the right hand value " + matchExpr.value);
                     System.exit(0);
                 }
@@ -369,13 +368,13 @@ public class Interpreter {
 
     static RuntimeValue evaluateStringLiterals(StringLiteral string, Environment env) {
         RStringValue newString = new RStringValue(string.value);
-        ArrayList<RuntimeValue> resulantValues = string.getInterpolatedValues().stream().map(arg -> evaluate(arg, env)).collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<RuntimeValue> resultantValues = string.getInterpolatedValues().stream().map(arg -> evaluate(arg, env)).collect(Collectors.toCollection(ArrayList::new));
         ArrayList<String> interpolatedStrings = string.getInterpolatedString();
 
-        if(resulantValues.size() == interpolatedStrings.size()) {
+        if(resultantValues.size() == interpolatedStrings.size()) {
 
-            for(int i = 0; i < resulantValues.size(); i++) {
-                newString.value = newString.value.replace("#{"+ interpolatedStrings.get(i) + "}", resulantValues.get(i).toRawString());
+            for(int i = 0; i < resultantValues.size(); i++) {
+                newString.value = newString.value.replace("#{"+ interpolatedStrings.get(i) + "}", resultantValues.get(i).toRawString());
             }
         }
         return newString;
