@@ -201,22 +201,18 @@ public class Interpreter {
                 return env.declareVariable(asIdentifier.symbol, evaluate(matchExpr.value, env));
             }
             case Tuple -> {
-                // Return the error before evaluating
-                if(matchExpr.value.getKind() != AstNode.Identifier && matchExpr.value.getKind() != AstNode.Tuple) {
-                    System.err.println("Match error. No match for the right hand value " + matchExpr.value);
-                    System.exit(0);
-                }
 
                 // toAssigned should be evaluated later on
 
-                var rhs = (RTupleValue) evaluate(matchExpr.value, env);
-                var lhsContents = ((Tuple) matchExpr.toAssigned).contents;
+                var rhsKind = evaluate(matchExpr.value, env);
 
-                // The next element after the match operator should be a tuple or an identifier with a tuple
-                if(rhs.getKind() != RuntimeValueType.Tuple) {
-                    System.err.println("Match error. No match for the right hand value " + rhs.contents);
+                if(rhsKind.getKind() != RuntimeValueType.Tuple) {
+                    System.out.println("Here");
+                    System.err.println("Match error. No match for the right hand value " + matchExpr.value);
                     System.exit(0);
                 }
+                var rhs = (RTupleValue) rhsKind;
+                var lhsContents = ((Tuple) matchExpr.toAssigned).contents;
 
                 // Check whether both the tuples have the same size
                 if(rhs.contents.size() != lhsContents.size()) {

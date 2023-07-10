@@ -1,2 +1,4 @@
 x = [1, 2, 3]
-print(List.pop(x))
+{x, y} = List.pop(x)
+print(x)
+print(y)
