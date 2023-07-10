@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 enum AstNode {
     Program,
@@ -113,6 +114,19 @@ class NumericLiteral extends Expr {
     @Override
     public AstNode getKind() {
         return AstNode.NumericLiteral;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NumericLiteral that = (NumericLiteral) o;
+        return kind == that.kind && Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(kind, value);
     }
 }
 
@@ -258,6 +272,19 @@ class StringLiteral extends Expr {
     public AstNode getKind() {
         return AstNode.StringLiteral;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StringLiteral that = (StringLiteral) o;
+        return Objects.equals(value, that.value) && Objects.equals(interpolatedString, that.interpolatedString) && Objects.equals(interpolatedValues, that.interpolatedValues);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value, interpolatedString, interpolatedValues);
+    }
 }
 
 class Tuple extends Expr {
@@ -277,6 +304,19 @@ class Tuple extends Expr {
     @Override
     public AstNode getKind() {
         return AstNode.Tuple;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tuple tuple = (Tuple) o;
+        return Objects.equals(contents, tuple.contents);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(contents);
     }
 }
 
@@ -298,6 +338,19 @@ class MapStructure extends Expr {
     public AstNode getKind() {
         return AstNode.Map;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MapStructure that = (MapStructure) o;
+        return Objects.equals(map, that.map);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(map);
+    }
 }
 
 class ListStructure extends Expr {
@@ -317,6 +370,19 @@ class ListStructure extends Expr {
     @Override
     public AstNode getKind() {
         return AstNode.List;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ListStructure that = (ListStructure) o;
+        return Objects.equals(contents, that.contents);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(contents);
     }
 }
 
@@ -415,6 +481,8 @@ class AnonymousFn extends Expr {
     public AstNode getKind() {
         return AstNode.AnonymousFn;
     }
+
+
 }
 
 class FunctionDeclaration extends Stmt {

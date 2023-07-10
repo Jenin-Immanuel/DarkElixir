@@ -48,6 +48,19 @@ class RNullValue extends RuntimeValue {
     public String toRawString() {
         return "";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RNullValue that = (RNullValue) o;
+        return kind == that.kind && Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(kind, value);
+    }
 }
 
 class RNumberValue extends RuntimeValue {
@@ -77,6 +90,19 @@ class RNumberValue extends RuntimeValue {
         }
         return number.toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RNumberValue that = (RNumberValue) o;
+        return kind == that.kind && Objects.equals(number, that.number);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(kind, number);
+    }
 }
 
 class RStringValue extends RuntimeValue {
@@ -104,6 +130,19 @@ class RStringValue extends RuntimeValue {
     public String toRawString() {
         return value.replaceAll("\"", "");
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RStringValue that = (RStringValue) o;
+        return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
+    }
 }
 
 class RBooleanValue extends RuntimeValue {
@@ -127,6 +166,19 @@ class RBooleanValue extends RuntimeValue {
     @Override
     public String toRawString() {
         return value.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RBooleanValue that = (RBooleanValue) o;
+        return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }
 
@@ -197,6 +249,19 @@ class RTupleValue extends RuntimeValue {
         val.append("}");
         return val.toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RTupleValue that = (RTupleValue) o;
+        return Objects.equals(contents, that.contents);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(contents);
+    }
 }
 
 class RListValue extends RuntimeValue {
@@ -231,6 +296,19 @@ class RListValue extends RuntimeValue {
         }
         val.append("]");
         return val.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RListValue that = (RListValue) o;
+        return Objects.equals(contents, that.contents);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(contents);
     }
 }
 
@@ -275,7 +353,18 @@ class RMapStructure extends RuntimeValue {
         return val.toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RMapStructure that = (RMapStructure) o;
+        return Objects.equals(map, that.map);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(map);
+    }
 }
 
 @FunctionalInterface
