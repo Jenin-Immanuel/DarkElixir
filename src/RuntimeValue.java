@@ -18,7 +18,9 @@ enum RuntimeValueType {
     IfNode,
     FunctionValue,
     AnonymousFn,
-    While
+    While,
+    Break,
+    Continue
 }
 
 public abstract class RuntimeValue {
@@ -559,3 +561,28 @@ class RWhile extends RuntimeValue {
     }
 }
 
+class RBreak extends RuntimeValue {
+
+    @Override
+    public RuntimeValueType getKind() {
+        return RuntimeValueType.Break;
+    }
+
+    @Override
+    public String toRawString() {
+        return null;
+    }
+}
+
+class RContinue extends RuntimeValue {
+
+    @Override
+    public RuntimeValueType getKind() {
+        return RuntimeValueType.Continue;
+    }
+
+    @Override
+    public String toRawString() {
+        return null;
+    }
+}

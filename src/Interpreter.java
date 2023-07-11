@@ -23,6 +23,10 @@ public class Interpreter {
         RuntimeValue lastEvaluated = new RNullValue();
         for(Stmt stmt: program.body) {
             lastEvaluated = evaluate(stmt, env);
+            if(lastEvaluated.getKind() == RuntimeValueType.Break || lastEvaluated.getKind() == RuntimeValueType.Continue) {
+                System.err.println("Top level break/continue statements are not allowed");
+                System.exit(0);
+            }
         }
         return lastEvaluated;
     }
@@ -381,37 +385,46 @@ public class Interpreter {
     }
 
     // Evaluate body of statements
-    static void evaluateBody(ArrayList<Stmt> body, Environment env) {
+    static RuntimeValue evaluateBody(ArrayList<Stmt> body, Environment env) {
         RuntimeValue lastEvaluated = new RNullValue();
         var scope = new Environment(env);
         for(var stmt: body){
             lastEvaluated = evaluate(stmt, scope);
+            if(lastEvaluated.getKind() == RuntimeValueType.Break || lastEvaluated.getKind() == RuntimeValueType.Continue)
+                return lastEvaluated;
             if(isReturnIssued) break;
         }
+        return new RBooleanValue(true);
     }
 
     // Evaluate If clause
-    static Boolean evaluateIfClause(IfNode ifNode, Environment env) {
+    static RuntimeValue evaluateIfClause(IfNode ifNode, Environment env) {
         if(ifNode.isElse) {
             evaluateBody(ifNode.block, env);
-            return true;
+            return new RBooleanValue(true);
         }
         var condition = evaluate(ifNode.condition, env);
         if(condition.getKind() == RuntimeValueType.Boolean){
             // If the condition is false
-            if(!((RBooleanValue) condition).value) return false;
+            if(!((RBooleanValue) condition).value) return new RBooleanValue(true);
         }
 
-        evaluateBody(ifNode.block, env);
-        return true;
+        var res = evaluateBody(ifNode.block, env);
+        if(res.getKind() != RuntimeValueType.Boolean)
+            return res;
+
+        return new RBooleanValue(true);
     }
 
     // Evaluating If statement
     static RuntimeValue evaluateIfStatement(IfStatement ifStatement, Environment env) {
         var clauses = ifStatement.clauses;
         for(IfNode clause: clauses) {
-            Boolean isEvaluated = evaluateIfClause(clause, env);
-            if(isEvaluated) break;
+            RuntimeValue isEvaluated = evaluateIfClause(clause, env);
+            if(isEvaluated.getKind() == RuntimeValueType.Boolean)
+                if(((RBooleanValue) isEvaluated).value) break;
+            if(isEvaluated.getKind() == RuntimeValueType.Break || isEvaluated.getKind() == RuntimeValueType.Continue)
+                return isEvaluated;
         }
         return new RBooleanValue(true);
     }
@@ -422,11 +435,20 @@ public class Interpreter {
             System.exit(0);
         }
         var condition = ((RBooleanValue) evaluate(whileStatement.condition, env)).value;
-
+        boolean doesBreak = false;
         while(condition) {
+
             for(var stmt: whileStatement.body) {
-                evaluate(stmt, env);
+                var res = evaluate(stmt, env);
+                if(res.getKind() == RuntimeValueType.Break) {
+                    doesBreak = true;
+                    break;
+                }
+                if(res.getKind() == RuntimeValueType.Continue) {
+                    break;
+                }
             }
+            if(doesBreak) break;
             condition = ((RBooleanValue) evaluate(whileStatement.condition, env)).value;
         }
         return new RNullValue();
@@ -499,6 +521,12 @@ public class Interpreter {
                 }
                 case AnonymousFn -> {
                     return evaluateAnonymousFn((AnonymousFn) astNode, env);
+                }
+                case Break -> {
+                    return new RBreak();
+                }
+                case Continue -> {
+                    return new RContinue();
                 }
                 default -> {
                     System.err.println("This AST Node has not yet been setup for interpretation. " + astNode);

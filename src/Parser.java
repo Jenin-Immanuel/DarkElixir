@@ -62,9 +62,11 @@ public class Parser {
                 return this.parseWhileStatement();
             }
             case Keyword_Break -> {
+                this.eat();
                 return new BreakStatement();
             }
             case Keyword_Continue -> {
+                this.eat();
                 return new ContinueStatement();
             }
             default -> {
