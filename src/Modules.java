@@ -163,7 +163,20 @@ public class Modules {
 
                     var map = (RMapStructure) firstArg;
                     RMapStructure res = new RMapStructure();
-
+                    for(Map.Entry<RuntimeValue, RuntimeValue> entry: map.map.entrySet()) {
+                        var key =  entry.getKey();
+                        var value = entry.getValue();
+                        innerScope.declareVariable(((Identifier)fnValue.parameters.get(0)).symbol, key, false);
+                        innerScope.declareVariable(((Identifier)fnValue.parameters.get(1)).symbol, value, false);
+                        var result = Interpreter.evaluate(fnValue.returnExpr, innerScope);
+                        if(result.getKind() != RuntimeValueType.Tuple)
+                            safeError("Enum.map The function should return a tuple of two elements for map operations");
+                        var t = (RTupleValue) result;
+                        if(t.contents.size() != 2)
+                            safeError("Enum.map The function should return a tuple of two elements for map operations");
+                        res.map.put(t.contents.get(0), t.contents.get(1));
+                    }
+                    return res;
                 }
             }
 
