@@ -19,7 +19,9 @@ enum AstNode {
     While,
     FunctionDeclaration,
     AnonymousFn,
-    ReturnStatement
+    ReturnStatement,
+    Break,
+    Continue
 }
 
 abstract class Stmt {
@@ -546,5 +548,21 @@ class WhileStatement extends Stmt {
     @Override
     public AstNode getKind() {
         return AstNode.While;
+    }
+}
+
+class BreakStatement extends Stmt {
+
+    @Override
+    public AstNode getKind() {
+        return AstNode.Break;
+    }
+}
+
+class ContinueStatement extends Stmt {
+
+    @Override
+    public AstNode getKind() {
+        return AstNode.Continue;
     }
 }

@@ -36,6 +36,8 @@ enum TokenType {
     Keyword_Return,
     Keyword_While,
     Keyword_Fn,
+    Keyword_Break,
+    Keyword_Continue,
     EOF
 }
 

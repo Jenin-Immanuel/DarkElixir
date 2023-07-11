@@ -32,6 +32,8 @@ public class Lexer {
         KEYWORDS.put("return", TokenType.Keyword_Return);
         KEYWORDS.put("while", TokenType.Keyword_While);
         KEYWORDS.put("fn", TokenType.Keyword_Fn);
+        KEYWORDS.put("break", TokenType.Keyword_Break);
+        KEYWORDS.put("continue", TokenType.Keyword_Continue);
     }
 
     private boolean borderCheck() {
