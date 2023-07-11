@@ -1,9 +1,8 @@
-x = 1
-while x <= 5 do
-    if(x == 3) do
-        x = x + 1
-        continue
+def fun() do
+    x = 1
+    if(x == 1) do
+        break
     end
-    print(x)
-    x = x + 1
 end
+
+fun()

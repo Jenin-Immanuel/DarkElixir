@@ -282,6 +282,10 @@ public class Interpreter {
             RuntimeValue result = new RNullValue();
             for(var stmt: fnValue.body) {
                 result = evaluate(stmt, scope);
+                if(result.getKind() == RuntimeValueType.Break || result.getKind() == RuntimeValueType.Continue) {
+                    System.err.println("Top level break/continue statements are not allowed");
+                    System.exit(0);
+                }
 
                 // If the executed statement is return
                 if(isReturnIssued && !returnStack.empty()) {
