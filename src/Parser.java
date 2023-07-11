@@ -402,10 +402,10 @@ public class Parser {
 
     private ArrayList<Expr> parseArgumentsList() {
         ArrayList<Expr> args = new ArrayList<>();
-        args.add(this.parseMatchExpr());
+        args.add(this.parseExpr());
         while(this.at().type == TokenType.Comma) {
             this.eat();
-            args.add(this.parseMatchExpr());
+            args.add(this.parseExpr());
         }
         return args;
     }

@@ -1,3 +1,2 @@
 x = %{a => 10, b => 20}
-a = fn x, y -> {x, y + 2} end
-print(Enum.map(x, a))
+print(Enum.map(x, fn x, y -> {x, y + 2} end))
