@@ -1,5 +1,3 @@
-x = %{a => "Hello", b => "Sello"}
-print(x)
-print(:a)
-x = Map.delete(x, :a)
-print(x)
+x = [1, 3, "Yay", 2, "Jenin"]
+
+print(Enum.sort(x))

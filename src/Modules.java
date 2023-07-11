@@ -1,7 +1,6 @@
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
+import java.lang.reflect.Array;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Modules {
 
@@ -52,8 +51,64 @@ public class Modules {
             }
             map.map.remove(args.get(1));
 
-
             return map;
+        })));
+
+        // fetch (map, key)
+        // Returns : The value of the particular key in the map or null if it is not present
+
+        module.functions.put("fetch", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argFormat = "InvalidArguments: Argument Format of Map.fetch/2 (map, key)";
+            expectArgs("Map.fetch", args.size(), 2, "(map, key)");
+            expect(args.get(0).getKind(), RuntimeValueType.Map, argFormat);
+
+            RMapStructure map = (RMapStructure) args.get(0);
+
+            if(!map.map.containsKey(args.get(1))) {
+                return new RNullValue();
+            }
+
+            return map.map.get(args.get(1));
+        })));
+
+        // replace(map, key, value)
+        // Returns: A new map with the updated value
+
+        module.functions.put("replace", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argFormat = "InvalidArguments: Argument Format of Map.replace/3 (map, key, value)";
+            expectArgs("Map.replace", args.size(), 3, "(map, key, value)");
+            expect(args.get(0).getKind(), RuntimeValueType.Map, argFormat);
+
+            RMapStructure map = (RMapStructure) args.get(0);
+            if(!map.map.containsKey(args.get(1))) {
+                safeError("IndexError: Map.replace() The given key is not present in the map");
+            }
+
+            map.map.replace(args.get(1), args.get(2));
+            return map;
+        })));
+
+        // to_list(map)
+
+        module.functions.put("to_list", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argFormat = "InvalidArguments: Argument Format of Map.to_list/1 (map)";
+            expectArgs("Map.to_list", args.size(), 1, "(map)");
+            expect(args.get(0).getKind(), RuntimeValueType.Map, argFormat);
+
+            RMapStructure map = (RMapStructure) args.get(0);
+            RListValue res = new RListValue();
+
+            for(Map.Entry<RuntimeValue, RuntimeValue> entry : map.map.entrySet()) {
+                var key = entry.getKey();
+                var value = entry.getValue();
+                RTupleValue ans = new RTupleValue();
+                ans.contents.add(key);
+                ans.contents.add(value);
+                res.contents.add(ans);
+            }
+
+
+            return res;
         })));
 
 
@@ -139,6 +194,76 @@ public class Modules {
         })));
 
         // sort/1
+        module.functions.put("sort", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argFormat = "InvalidArguments: Argument Format of Enum.sort/1 (enumerable)";
+            expectArgs("Enum.sort", args.size(), 1, "(enumerable)");
+            expect(args.get(0).getKind(), RuntimeValueType.List, argFormat);
+
+            RListValue list = (RListValue) args.get(0);
+            RListValue newList = new RListValue();
+
+            // Precedence
+            // Number, Atom, Tuple, List, Map, String
+            int size = 0;
+            for(int i = 0; i < 5; i++) {
+                if(newList.contents.size() == list.contents.size()) break;
+
+                // Get the required list
+                switch (i) {
+                    case 0 -> {
+                        // Number
+                        // Get all the numbers from the given list
+                        ArrayList<RNumberValue> t = list.contents.stream()
+                                .filter(e -> e.getKind() == RuntimeValueType.Number)
+                                .map(e -> (RNumberValue) e)
+                                .sorted(Comparator.comparing(o -> o.number))
+                                .collect(Collectors.toCollection(ArrayList::new));
+                        newList.contents.addAll(t);
+                    }
+                    case 1 -> {
+                        // Atom
+                        // Get all the atoms from the list
+                        ArrayList<RAtomValue> t = list.contents.stream()
+                                .filter(e -> e.getKind() == RuntimeValueType.Atom)
+                                .map(e -> (RAtomValue) e)
+                                .sorted(Comparator.comparing(o -> o.value))
+                                .collect(Collectors.toCollection(ArrayList::new));
+                        newList.contents.addAll(t);
+                    }
+                    case 2 -> {
+                        // Tuples
+                        // Get all tuples
+                        ArrayList<RTupleValue> t = list.contents.stream()
+                                .filter(e -> e.getKind() == RuntimeValueType.Tuple)
+                                .map(e -> (RTupleValue) e)
+                                .sorted(Comparator.comparing(o -> o.contents.size())).
+                                collect(Collectors.toCollection(ArrayList::new));
+                        newList.contents.addAll(t);
+                    }
+                    case 3 -> {
+                        // List
+                        ArrayList<RListValue> t = list.contents.stream()
+                                .filter(e -> e.getKind() == RuntimeValueType.List)
+                                .map(e -> (RListValue) e)
+                                .sorted(Comparator.comparing(o -> o.contents.size())).
+                                collect(Collectors.toCollection(ArrayList::new));
+                        newList.contents.addAll(t);
+                    }
+                    case 4 -> {
+                        // String
+                        ArrayList<RStringValue> t = list.contents.stream()
+                                .filter(e -> e.getKind() == RuntimeValueType.String)
+                                .map(e -> (RStringValue) e)
+                                .sorted(Comparator.comparing(o -> o.value))
+                                .collect(Collectors.toCollection(ArrayList::new));
+                        newList.contents.addAll(t);
+                    }
+                }
+            }
+
+            return newList;
+        })));
+
         // sort/2
 
         scope.declareVariable("Enum", module, true);
