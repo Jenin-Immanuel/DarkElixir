@@ -1,6 +1,4 @@
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Modules {
@@ -490,7 +488,7 @@ public class Modules {
             RStringValue stringValue = (RStringValue) args.get(0);
 
 
-            return new RNumberValue((double) stringValue.value.length());
+            return new RNumberValue((double) stringValue.value.length() - 2);
         })));
 
         // split
@@ -504,7 +502,7 @@ public class Modules {
             RListValue list = new RListValue();
             var l = stringValue.value.split(delimiterValue.toRawString());
             for(var e: l)
-                list.contents.add(new RStringValue(e));
+                list.contents.add(new RStringValue("\"" + e.replace("\"", "") + "\""));
 
             return list;
         })));
@@ -515,6 +513,26 @@ public class Modules {
     static void declareNumberModule(Environment scope) {
         RModule module = new RModule("Number");
 
+        module.functions.put("pow", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            // validation
+            String argFormat = "InvalidArguments: Argument Format of Number.pow/2 (base, exponent)";
+            expectArgs("Number.pow", args.size(), 2, "(base, exponent)");
+            expect(args.get(0).getKind(), RuntimeValueType.Number, argFormat);
+            expect(args.get(1).getKind(), RuntimeValueType.Number, argFormat);
+            var n1 = (RNumberValue) args.get(0);
+            var n2 = (RNumberValue) args.get(1);
+            return new RNumberValue(Math.pow(n1.number, n2.number));
+        })));
+
+        module.functions.put("floor_div", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argFormat = "InvalidArguments: Argument Format of Number.floor_div/2 (dividend, divisor)";
+            expectArgs("Number.floor_div", args.size(), 2, "(dividend, divisor)");
+            expect(args.get(0).getKind(), RuntimeValueType.Number, argFormat);
+            expect(args.get(1).getKind(), RuntimeValueType.Number, argFormat);
+            var n1 = (RNumberValue) args.get(0);
+            var n2 = (RNumberValue) args.get(1);
+            return new RNumberValue(Math.floor(n1.number / n2.number));
+        })));
         scope.declareVariable("Number", module, true);
     }
      static void declareAllModules(Environment env) {
@@ -523,5 +541,6 @@ public class Modules {
         declareListModule(env);
         declareMapModule(env);
         declareStringModule(env);
+        declareNumberModule(env);
     }
 }

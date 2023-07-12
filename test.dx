@@ -1,2 +1,1 @@
-x = "Hello,World"
-print(String.split(x, "e"))
+print(Number.floor_div(5, 2))
