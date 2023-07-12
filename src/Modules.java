@@ -1,5 +1,6 @@
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Modules {
@@ -477,10 +478,50 @@ public class Modules {
 
         scope.declareVariable("List", module, true);
     }
+
+    static void declareStringModule(Environment scope) {
+        RModule module = new RModule("String");
+
+        // length
+        module.functions.put("length", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argFormat = "InvalidArguments: Argument Format of String.length/1 (string)";
+            expectArgs("String.length", args.size(), 1, "(string)");
+            expect(args.get(0).getKind(), RuntimeValueType.String, argFormat);
+            RStringValue stringValue = (RStringValue) args.get(0);
+
+
+            return new RNumberValue((double) stringValue.value.length());
+        })));
+
+        // split
+        module.functions.put("split", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argFormat = "InvalidArguments: Argument Format of String.split/2 (string, separator)";
+            expectArgs("String.split", args.size(), 2, "(string, separator)");
+            expect(args.get(0).getKind(), RuntimeValueType.String, argFormat);
+            expect(args.get(1).getKind(), RuntimeValueType.String, argFormat);
+            RStringValue stringValue = (RStringValue) args.get(0);
+            RStringValue delimiterValue = (RStringValue) args.get(1);
+            RListValue list = new RListValue();
+            var l = stringValue.value.split(delimiterValue.toRawString());
+            for(var e: l)
+                list.contents.add(new RStringValue(e));
+
+            return list;
+        })));
+
+        scope.declareVariable("String", module, true);
+    }
+
+    static void declareNumberModule(Environment scope) {
+        RModule module = new RModule("Number");
+
+        scope.declareVariable("Number", module, true);
+    }
      static void declareAllModules(Environment env) {
         declareTupleModule(env);
         declareEnumModule(env);
         declareListModule(env);
         declareMapModule(env);
+        declareStringModule(env);
     }
 }

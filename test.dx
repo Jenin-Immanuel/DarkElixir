@@ -1,8 +1,2 @@
-def fun() do
-    x = 1
-    if(x == 1) do
-        break
-    end
-end
-
-fun()
+x = "Hello,World"
+print(String.split(x, "e"))
