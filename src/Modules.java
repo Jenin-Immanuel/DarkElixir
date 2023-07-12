@@ -18,10 +18,17 @@ public class Modules {
     }
 
     static void expectEnumerable(RuntimeValue given, String argFormat) {
-        if(given.getKind() != RuntimeValueType.List && given.getKind() != RuntimeValueType.Map) {
-            System.err.println(argFormat);
-            System.exit(0);
-        }
+        if(given.getKind() == RuntimeValueType.List || given.getKind() == RuntimeValueType.Map)
+            return;
+        System.err.println(argFormat);
+        System.exit(0);
+    }
+
+    static void expectFunction(RuntimeValue given, String argFormat) {
+        if(given.getKind() == RuntimeValueType.AnonymousFn || given.getKind() == RuntimeValueType.FunctionValue)
+            return;
+        System.err.println(argFormat);
+        System.exit(0);
     }
 
     static void safeError(String msg) {
@@ -276,7 +283,169 @@ public class Modules {
             return newList;
         })));
 
-        // sort/2
+        // reverse/1
+        module.functions.put("reverse", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argFormat = "InvalidArguments: Argument Format of Enum.reverse/1 (enumerable)";
+            expectArgs("Enum.reverse", args.size(), 1, "(enumerable)");
+            expect(args.get(0).getKind(), RuntimeValueType.List, argFormat);
+
+            RListValue list = (RListValue) args.get(0);
+            RListValue newList = new RListValue();
+
+            // Precedence
+            // Number, Atom, Tuple, List, Map, String
+            for(int i = 4; i >= 0; i--) {
+                if(newList.contents.size() == list.contents.size()) break;
+
+                // Get the required list
+                switch (i) {
+                    case 0 -> {
+                        // Number
+                        // Get all the numbers from the given list
+                        ArrayList<RNumberValue> t = list.contents.stream()
+                                .filter(e -> e.getKind() == RuntimeValueType.Number)
+                                .map(e -> (RNumberValue) e)
+                                .sorted(Comparator.comparing(o -> ((RNumberValue) o).number).reversed())
+                                .collect(Collectors.toCollection(ArrayList::new));
+                        newList.contents.addAll(t);
+                    }
+                    case 1 -> {
+                        // Atom
+                        // Get all the atoms from the list
+                        ArrayList<RAtomValue> t = list.contents.stream()
+                                .filter(e -> e.getKind() == RuntimeValueType.Atom)
+                                .map(e -> (RAtomValue) e)
+                                .sorted(Comparator.comparing(o -> ((RAtomValue) o).value).reversed())
+                                .collect(Collectors.toCollection(ArrayList::new));
+                        newList.contents.addAll(t);
+                    }
+                    case 2 -> {
+                        // Tuples
+                        // Get all tuples
+                        ArrayList<RTupleValue> t = list.contents.stream()
+                                .filter(e -> e.getKind() == RuntimeValueType.Tuple)
+                                .map(e -> (RTupleValue) e)
+                                .sorted(Comparator.comparing(o -> ((RTupleValue) o).contents.size()).reversed()).
+                                collect(Collectors.toCollection(ArrayList::new));
+                        newList.contents.addAll(t);
+                    }
+                    case 3 -> {
+                        // List
+                        ArrayList<RListValue> t = list.contents.stream()
+                                .filter(e -> e.getKind() == RuntimeValueType.List)
+                                .map(e -> (RListValue) e)
+                                .sorted(Comparator.comparing(o -> ((RListValue) o).contents.size()).reversed())
+                                .collect(Collectors.toCollection(ArrayList::new));
+                        newList.contents.addAll(t);
+                    }
+                    case 4 -> {
+                        // String
+                        ArrayList<RStringValue> t = list.contents.stream()
+                                .filter(e -> e.getKind() == RuntimeValueType.String)
+                                .map(e -> (RStringValue) e)
+                                .sorted(Comparator.comparing(o -> ((RStringValue) o).value))
+                                .collect(Collectors.toCollection(ArrayList::new));
+                        newList.contents.addAll(t);
+                    }
+                }
+            }
+
+            return newList;
+        })));
+
+        // count
+        module.functions.put("count", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argFormat = "InvalidArguments: Argument Format of Enum.count/1 (enumerable)";
+            expectArgs("Enum.reverse", args.size(), 1, "(enumerable)");
+            expectEnumerable(args.get(0), argFormat);
+
+            switch(args.get(0).getKind()) {
+                case List -> {
+                    return new RNumberValue((double) ((RListValue) args.get(0)).contents.size());
+                }
+                case Map -> {
+                    return new RNumberValue((double) ((RMapStructure) args.get(0)).map.size());
+                }
+            }
+            return new RNullValue();
+        })));
+
+        // each/2
+
+        module.functions.put("each", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argFormat = "InvalidArguments: Argument Format of Enum.each/2 (enumerable, fn)";
+            expectArgs("Enum.each", args.size(), 2, "(enumerable, fn)");
+            expectEnumerable(args.get(0), argFormat);
+            expectFunction(args.get(1), argFormat);
+
+
+            var e = args.get(0);
+            var f = args.get(1);
+            switch (e.getKind()) {
+                case List -> {
+                    var list = (RListValue) e;
+                    switch (f.getKind()) {
+                        case AnonymousFn -> {
+                            var fn = (RAnonymousFn) f;
+                            var innerScope = new Environment(fn.declarationEnv);
+                            list.contents.forEach(element -> {
+                                innerScope.declareVariable(((Identifier)fn.parameters.get(0)).symbol, element, false);
+                                Interpreter.evaluate(fn.returnExpr, innerScope);
+                            });
+                        }
+                        case FunctionValue -> {
+                            var fn = (RFunctionValue) f;
+                            if(fn.parameters.size() != 1)
+                                safeError("Enum.each The given function should have only one argument for lists");
+                            var innerScope = new Environment(fn.declarationEnv);
+                            list.contents.forEach(element -> {
+                                innerScope.declareVariable(((Identifier)fn.parameters.get(0)).symbol, element, false);
+                                fn.body.forEach(stmt -> {
+                                    var res = Interpreter.evaluate(stmt, innerScope);
+                                    if(res.getKind() == RuntimeValueType.Break || res.getKind() == RuntimeValueType.Continue)
+                                        safeError("Top level break/continue statements are not allowed");
+                                });
+                            });
+                        }
+                    }
+
+
+                }
+                case Map -> {
+                    var map = (RMapStructure) e;
+                    switch (f.getKind()) {
+                        case AnonymousFn ->  {
+                            var fn = (RAnonymousFn) f;
+                            if(fn.parameters.size() != 2)
+                                safeError("Enum.each The given function should have two arguments for maps");
+                            var innerScope = new Environment(fn.declarationEnv);
+                            map.map.forEach((key, value) -> {
+                                innerScope.declareVariable(((Identifier)fn.parameters.get(0)).symbol, key, false);
+                                innerScope.declareVariable(((Identifier)fn.parameters.get(1)).symbol, value, false);
+                                Interpreter.evaluate(fn.returnExpr, innerScope);
+                            });
+                        }
+                        case FunctionValue -> {
+                            var fn = (RFunctionValue) f;
+                            if(fn.parameters.size() != 2)
+                                safeError("Enum.each The given function should have two arguments for maps");
+                            var innerScope = new Environment(fn.declarationEnv);
+                            map.map.forEach((key, value) -> {
+                                innerScope.declareVariable(((Identifier)fn.parameters.get(0)).symbol, key, false);
+                                innerScope.declareVariable(((Identifier)fn.parameters.get(1)).symbol, value, false);
+                                fn.body.forEach(stmt -> {
+                                    var res = Interpreter.evaluate(stmt, innerScope);
+                                    if(res.getKind() == RuntimeValueType.Break || res.getKind() == RuntimeValueType.Continue)
+                                        safeError("Top level break/continue statements are not allowed");
+                                });
+                            });
+                        }
+                    }
+                }
+            }
+
+            return new RNullValue();
+        })));
 
         scope.declareVariable("Enum", module, true);
     }
