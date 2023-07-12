@@ -123,6 +123,10 @@ class RStringValue extends RuntimeValue {
                 '}';
     }
 
+    public String withQuotes() {
+        return "\"" + value.replaceAll("\"", "") + "\"";
+    }
+
     @Override
     public RuntimeValueType getKind() {
         return RuntimeValueType.String;
@@ -245,7 +249,10 @@ class RTupleValue extends RuntimeValue {
     public String toRawString() {
         StringBuilder val = new StringBuilder("{ ");
         for(var content: contents) {
-            val.append(content.toRawString());
+            if(content.getKind() == RuntimeValueType.String)
+                val.append(((RStringValue) content).withQuotes());
+            else
+                val.append(content.toRawString());
             val.append(" ");
         }
         val.append("}");
@@ -294,8 +301,15 @@ class RListValue extends RuntimeValue {
     @Override
     public String toRawString() {
         StringBuilder val = new StringBuilder("[ ");
+        int t = 0;
         for(var content: contents) {
-            val.append(content.toRawString());
+            if(content.getKind() == RuntimeValueType.String)
+                val.append(((RStringValue) content).withQuotes());
+            else
+                val.append(content.toRawString());
+            if(t != contents.size() - 1)
+                val.append(",");
+            t++;
             val.append(" ");
         }
         val.append("]");

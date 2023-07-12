@@ -42,7 +42,11 @@ public class Environment {
         env.declareVariable("print", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
             StringBuilder string = new StringBuilder();
             for(var arg: args) {
-                string.append(arg.toRawString()).append(" ");
+                if(arg.getKind() == RuntimeValueType.String) {
+                    string.append(((RStringValue) arg).withQuotes()).append(" ");
+                }
+                else
+                    string.append(arg.toRawString()).append(" ");
             }
             System.out.println(string.toString().trim());
             return new RNullValue();
