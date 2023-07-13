@@ -179,7 +179,7 @@ public class Interpreter {
 
     static RuntimeValue evaluateMatchExpr(MatchExpr matchExpr, Environment env) {
 
-        if(matchExpr.toAssigned.getKind() != AstNode.Identifier && matchExpr.toAssigned.getKind() != AstNode.Tuple) {
+        if(matchExpr.toAssigned.getKind() != AstNode.Identifier && matchExpr.toAssigned.getKind() != AstNode.Tuple && matchExpr.toAssigned.getKind() != AstNode.List) {
             System.err.println("Invalid LHS of the Match expression " + matchExpr.toAssigned);
             System.exit(0);
         }
@@ -243,6 +243,42 @@ public class Interpreter {
                 }
                 return rhs;
 
+            }
+            case List -> {
+                var rhsKind = evaluate(matchExpr.value, env);
+
+                if(rhsKind.getKind() != RuntimeValueType.List) {
+                    System.err.println("Match error. No match for the right hand value " + matchExpr.value);
+                    System.exit(0);
+                }
+                var rhs = (RListValue) rhsKind;
+                var lhsContents = ((ListStructure) matchExpr.toAssigned).contents;
+
+                // Check whether both the tuples have the same size
+                if(rhs.contents.size() != lhsContents.size()) {
+                    System.err.println("Match error. No match for the right hand value " + rhs.contents);
+                    System.exit(0);
+                }
+
+                // Check whether the functionality is pattern matching or multiple assignment
+                if(lhsContents.stream().allMatch(n -> n.getKind() == AstNode.Identifier) && !lhsContents.isEmpty()) {
+                    // Multiple assignments
+                    for(int i = 0; i < lhsContents.size(); i++) {
+                        Identifier variableLHS = (Identifier) lhsContents.get(i);
+                        RuntimeValue variableRHS = rhs.contents.get(i);
+                        env.declareVariable(variableLHS.symbol, variableRHS);
+                    }
+
+                }
+                else {
+                    for(int i = 0; i < lhsContents.size(); i++) {
+                        if(evaluate(lhsContents.get(i), env).getKind() != rhs.contents.get(i).getKind()) {
+                            System.err.println("Match error. No match for the right hand value " + rhs);
+                            System.exit(0);
+                        }
+                    }
+                }
+                return rhs;
             }
             default -> {
 
