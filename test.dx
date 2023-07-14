@@ -1,2 +1,3 @@
 x = input("What's your name?: ")
-print("My name is #{x}")
+y = String.to_number(x)
+print(y + 1)

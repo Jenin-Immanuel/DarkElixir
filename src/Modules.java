@@ -676,6 +676,22 @@ public class Modules {
             return list;
         })));
 
+        // to_number
+        module.functions.put("to_number", RNativeFunction.MAKE_NATIVE_FN(((args, env) -> {
+            String argFormat = "InvalidArguments: Argument Format of String.to_number/1 (string)";
+            expectArgs("String.to_number", args.size(), 1, "(string)");
+            expect(args.get(0).getKind(), RuntimeValueType.String, argFormat);
+            var arg = (RStringValue) args.get(0);
+            double res = 0;
+            try {
+                res = Double.parseDouble(arg.toRawString());
+            } catch(Exception e) {
+                System.out.println("Expecting a string with number for input() function");
+                System.exit(0);
+            }
+            return new RNumberValue(res);
+        })));
+
         scope.declareVariable("String", module, true);
     }
 
