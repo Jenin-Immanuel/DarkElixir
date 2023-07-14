@@ -1,3 +1,2 @@
-[x, y] = [1, 2]
-print(x)
-print(y)
+x = input("What's your name?: ")
+print("My name is #{x}")

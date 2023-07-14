@@ -51,6 +51,19 @@ public class Environment {
             return new RNullValue();
         }), true);
 
+        env.declareVariable("input", RNativeFunction.MAKE_NATIVE_FN(((args, env1) -> {
+            String argFormat = "(prompt)";
+            Modules.expectArgs("input", 1, args.size(), argFormat);
+            Modules.expect(args.get(0).getKind(), RuntimeValueType.String, argFormat);
+
+            Scanner sc = new Scanner(System.in);
+            var prompt = (RStringValue) args.get(0);
+            System.out.println(prompt.toRawString());
+            var res = sc.nextLine();
+
+            return new RStringValue(res);
+        })), true);
+
         env.declareVariable("date", RNativeFunction.MAKE_NATIVE_FN((args, scope) -> {
             System.out.println(Date.from(Instant.now()));
             return new RNullValue();
